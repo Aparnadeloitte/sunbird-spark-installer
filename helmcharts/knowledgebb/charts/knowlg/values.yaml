@@ -143,6 +143,36 @@ cloudstorage_metadata_list: '["appIcon", "artifactUrl", "posterImage", "previewU
 cloudstorage_write_base_path: '["https://{{ .Values.global.object_storage_endpoint }}"]'
 cloudstorage_read_base_path: "https://{{ .Values.global.object_storage_endpoint }}"
 
+
+inquiry:
+  assessment:
+    publish_kafka_topic: "{{ .Values.global.env }}.knowlg.publish.job.request"
+    import_kafka_topic: "{{ .Values.global.env }}.object.import.request"
+    copy_origin_data: '["name", "author", "license", "organisation"]'
+    copy_props_to_remove: '["downloadUrl", "artifactUrl", "variants",
+      "createdOn", "collections", "children", "lastUpdatedOn", "SYS_INTERNAL_LAST_UPDATED_ON",
+      "versionKey", "s3Key", "status", "pkgVersion", "toc_url", "mimeTypesCount",
+      "contentTypesCount", "leafNodesCount", "childNodes", "prevState", "lastPublishedOn",
+      "flagReasons", "compatibilityLevel", "size", "publishChecklist", "publishComment",
+      "LastPublishedBy", "rejectReasons", "rejectComment", "gradeLevel", "subject",
+      "medium", "board", "topic", "purpose", "subtopic", "contentCredits",
+      "owner", "collaborators", "creators", "contributors", "badgeAssertions", "dialcodes",
+      "concepts", "keywords", "reservedDialcodes", "dialcodeRequired", "leafNodes", "sYS_INTERNAL_LAST_UPDATED_ON", "prevStatus", "lastPublishedBy", "streamingUrl"]'
+    item:
+      keyspace: "{{ .Values.global.env }}_content_store"
+      table: "question_data"
+  required_props: '["name", "code", "mimeType", "framework", "channel"]'
+  cloudstorage_metadata_list: '["appIcon", "artifactUrl", "posterImage", "previewUrl", "thumbnail", "assetsMap", "certTemplate", "itemSetPreviewUrl", "grayScaleAppIcon", "sourceURL", "variants", "downloadUrl", "streamingUrl", "toc_url", "data", "question", "solutions", "editorState", "media", "pdfUrl", "transcripts"]'
+  cloudstorage_relative_path_prefix: CONTENT_STORAGE_BASE_PATH
+  cloudstorage_base_path: "https://{{ .Values.global.object_storage_endpoint }}"
+  valid_cloudstorage_base_urls: '["https://{{ .Values.global.object_storage_endpoint }}","https://obj.dev.sunbird.org"]'
+  search_service_base_url: http://search-service:9000/v3/search
+  question_list_limit: 20
+  # V5 API Configurations
+  v5_supported_qumlVersions: '[1.1]'
+  v5_default_qumlVersion: 1.1
+
+
 javaenv: 
   javaoptions: -Xms500m -Xmx500m
   _javaoptions: -Dlog4j2.formatMsgNoLookups=true
