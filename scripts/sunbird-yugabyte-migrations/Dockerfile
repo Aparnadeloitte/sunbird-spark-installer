@@ -1,7 +1,7 @@
 FROM yugabytedb/yugabyte:latest
 
-# Copy migration scripts from the local repository
-COPY scripts/sunbird-yugabyte-migrations /opt/migrations/sunbird-yugabyte-migrations
+# Copy migration scripts from current directory
+COPY . /opt/migrations/sunbird-yugabyte-migrations
 
 # Set proper permissions
 RUN chmod -R 755 /opt/migrations/sunbird-yugabyte-migrations
