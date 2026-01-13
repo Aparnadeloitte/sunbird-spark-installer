@@ -18,10 +18,6 @@ spec:
       volumes:
       - name: shared-volume
         emptyDir: {}
-      - name: scripts-volume
-        hostPath:
-          path: /scripts
-          type: Directory
       initContainers:
       - name: wait-for-yugabyte
         image: busybox
@@ -32,25 +28,9 @@ spec:
         volumeMounts:
         - name: shared-volume
           mountPath: /opt/shared-volume
-      - name: clone-migrations
-        image: alpine/git
-        imagePullPolicy: IfNotPresent
-        command: ['sh', '-c']
-        args:
-        - |
-          set -ex
-          cd /opt/shared-volume
-          # Copy local migration files
-          cp -r /scripts/sunbird-yugabyte-migrations /opt/shared-volume/
-          chmod -R 777 /opt/shared-volume/sunbird-yugabyte-migrations
-        volumeMounts:
-        - name: shared-volume
-          mountPath: /opt/shared-volume
-        - name: scripts-volume
-          mountPath: /scripts
       containers:
       - name: migration
-        image: yugabytedb/yugabyte:latest
+        image: sunbirded.azurecr.io/yugabytecql:v1.0.0
         imagePullPolicy: IfNotPresent
         command: ['bash', '-c']
         args:
@@ -61,8 +41,8 @@ spec:
           export YCQLSH_PORT={{ .Values.global.yugabyte.port }}
           export YCQLSH_USERNAME="${YCQLSH_USERNAME:-yugabyte}"
           export YCQLSH_PASSWORD="${YCQLSH_PASSWORD:-yugabyte}"
-          # run migrations from local scripts folder
-          cd /opt/shared-volume/sunbird-yugabyte-migrations/sunbird-knowlg
+          # run migrations directly from embedded scripts
+          cd /opt/migrations/sunbird-yugabyte-migrations/sunbird-knowlg
           chmod +x execute_migrations.sh || true
           ./execute_migrations.sh $ENV
         volumeMounts:
