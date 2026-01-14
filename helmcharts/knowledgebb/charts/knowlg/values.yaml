@@ -171,6 +171,13 @@ inquiry:
   # V5 API Configurations
   v5_supported_qumlVersions: '[1.1]'
   v5_default_qumlVersion: 1.1
+  # Assessment Configuration
+  assessment_skip_validation: false
+  assessment_default_framework: "NCF"
+  assessment_item_mime_type: "application/vnd.ekstep.ecml-archive"
+  assessment_media_resolution: "low"
+  # Neo4j Configuration
+  neo4j_objecttypes_enabled: '["Question"]'
 
 
 javaenv:
