@@ -107,8 +107,8 @@ class CeleryConfig:
 CELERY_CONFIG = CeleryConfig
 # Simple file-based cache (no Redis)
 CACHE_CONFIG = {
-      'CACHE_TYPE': 'SimpleCache',
-      'CACHE_DEFAULT_TIMEOUT': 300,
+      'CACHE_TYPE':('SimpleCache'),
+      'CACHE_DEFAULT_TIMEOUT':300,
       'CACHE_KEY_PREFIX': 'superset_',
 }
 DATA_CACHE_CONFIG = CACHE_CONFIG
