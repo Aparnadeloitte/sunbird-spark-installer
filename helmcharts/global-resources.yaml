@@ -254,9 +254,6 @@ kong:
       memory: 100M
     limits:
       cpu: 1
-<<<<<<< HEAD
-      memory: 1G    
-=======
       memory: 1024Mi
 
 registry:
@@ -400,7 +397,6 @@ reloader:
         limits:
           cpu: 1000m
           memory: 1G
->>>>>>> yugabyte-helm
 
 kube-prometheus-stack:
   alertmanager:
