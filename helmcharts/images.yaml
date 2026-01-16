@@ -185,7 +185,11 @@ images:
   nlwebflink: &nlwebflink
     repository: "sunbirded.azurecr.io/flink-nlweb"
     tag: "v1.0.0"
- 
+
+  yugabyte: &yugabyte  
+    registry: yugabytedb
+    repository: yugabyte
+    tag: 2025.2.0.0-b131 
 
 # Internal block with pull secrets
 internal: &internal
@@ -397,7 +401,10 @@ internal: &internal
     image: *nlwebflink
     imagePullSecrets:
       - name: "registry-secret-name"
- 
+  yugabyte:
+    image: *yugabyte
+    imagePullSecrets:
+      - name: "registry-secret-name"
 
 # Merge internal into root for direct access
 <<: *internal
