@@ -80,16 +80,6 @@ player:
       cpu: 1
       memory: 1G      
 
-    
-#inquirybb
-assessment:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 100M
-    limits:
-      cpu: 1
-      memory: 1G
       
 flink: &flink
   resources:
@@ -110,7 +100,7 @@ learnbb:
   flink: *flink
 
 #knowledgebb
-content:
+knowlg:
   resources:
     requests:
       cpu: 100m
@@ -127,14 +117,6 @@ dial:
       cpu: 1
       memory: 1024Mi   
 
-learning:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 1024Mi
-    limits:
-      cpu: 1
-      memory: 4096Mi  
 
 search:
   resources:
@@ -144,15 +126,6 @@ search:
     limits:
       cpu: 1
       memory: 1024Mi 
-
-taxonomy:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 100Mi
-    limits:
-      cpu: 1
-      memory: 1024Mi
 
 #learnbb
 adminutils:
