@@ -254,7 +254,149 @@ kong:
       memory: 100M
     limits:
       cpu: 1
-      memory: 1G    
+      memory: 1024Mi
+
+registry:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 1
+      memory: 2G
+
+userorg:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 1
+      memory: 1024Mi
+
+kafka:
+  resources:
+    limits:
+      cpu: 1
+      memory: 2048Mi
+    requests:
+      cpu: 750m
+      memory: 1024Mi
+  persistence:
+    size: 10Gi
+  zookeeper:  
+    persistence:
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 256m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+neo4j:
+  resources:
+    requests:
+      cpu: "0.5"
+      memory: "2Gi"
+    limits:
+      cpu: "1"
+      memory: "4Gi"
+  neo4j:
+    pvc:
+      storage: 25Gi
+
+
+telemetry:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 1
+      memory: 1024Mi
+
+postgresql: 
+  persistence:
+    size: 25Gi
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+superset:
+  resources:
+    limits:
+      cpu: 512m
+      memory: 1024Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi      
+
+#monitoring
+loki:
+  gateway:
+    resources: 
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+
+kubernetes-dashboard:
+  api:
+    containers:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits:
+          cpu: 250m
+          memory: 400Mi
+  web:
+    containers:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits:
+          cpu: 250m
+          memory: 400Mi
+  metricsScraper:
+    containers:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits:
+          cpu: 250m
+          memory: 400Mi
+
+alloy:
+ alloy:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+reloader:
+  reloader:
+    deployment:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+        limits:
+          cpu: 1000m
+          memory: 1G
 
 kube-prometheus-stack:
   alertmanager:
