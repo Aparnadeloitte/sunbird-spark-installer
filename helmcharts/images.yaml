@@ -19,15 +19,9 @@ images:
     tag: "1.0.6"
 
   kafka: &kafka
-    registry: "sunbirded.azurecr.io"
-    repository: "kafka"
-    tag: "3.3.1-debian-11-r25"
-
-  zookeeper: &zookeeper
-    registry: "sunbirded.azurecr.io"
-    repository: "zookeeper"
-    tag: "3.8.1-debian-11-r6"
-
+    registry: "docker.io"
+    repository: sanketikahub/kafka
+    tag: "4.0.0"
 
   postgresql: &postgresql
     registry: "sunbirded.azurecr.io"
@@ -203,12 +197,6 @@ internal: &internal
     imagePullSecrets:
       - name: "registry-secret-name"
 
-  zookeeper:
-    image: *zookeeper
-    imagePullSecrets:
-      - name: "registry-secret-name"
-
-
   postgresql:
     image: *postgresql
     imagePullSecrets:
@@ -244,7 +232,7 @@ internal: &internal
     imagePullSecrets:
       - name: "registry-secret-name"      
 
-  discussion_mw:
+  discussionmw:
     image: *discussion_mw
     imagePullSecrets:
       - name: "registry-secret-name"
@@ -270,12 +258,12 @@ internal: &internal
     imagePullSecrets:
       - name: "registry-secret-name"
 
-  kong_apis:
+  kong-apis:
     image: *kong_apis
     imagePullSecrets:
       - name: "registry-secret-name"
 
-  kong_consumer:
+  kong-consumer:
     image: *kong_consumer
     imagePullSecrets:
       - name: "registry-secret-name"
@@ -285,12 +273,12 @@ internal: &internal
     imagePullSecrets:
       - name: "registry-secret-name"
 
-  nginx_private_ingress:
+  nginx-private-ingress:
     image: *nginx_private_ingress
     imagePullSecrets:
       - name: "registry-secret-name"
 
-  nginx_public_ingress:
+  nginx-public-ingress:
     image: *nginx_public_ingress
     imagePullSecrets:
       - name: "registry-secret-name"
@@ -414,7 +402,7 @@ global:
   learnflink:
     registry: "ghcr.io/sunbird-lern"
     repository: "data-pipeline"
-    tag: "spark-v0.1_c16eb9a"
+    tag: "spark-v0.2_7258208"
 
   inquiryflink:
     registry: "sunbirded.azurecr.io"
