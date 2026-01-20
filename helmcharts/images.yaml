@@ -39,11 +39,6 @@ images:
     repository: "redis"
     tag: "7.0.9-debian-11-r1"
 
-  postgresql: &postgresql
-    registry: "sunbirded.azurecr.io"
-    repository: "postgresql"
-    tag: "11.14.0"  
-
   elasticsearch: &elasticsearch
     registry: "sunbirded.azurecr.io"
     repository: "elasticsearch"
