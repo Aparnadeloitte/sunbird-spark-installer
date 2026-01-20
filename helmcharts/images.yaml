@@ -23,12 +23,6 @@ images:
     repository: sanketikahub/kafka
     tag: "4.0.0"
 
-  zookeeper: &zookeeper
-    registry: "sunbirded.azurecr.io"
-    repository: "zookeeper"
-    tag: "3.8.1-debian-11-r6"
-
-
   postgresql: &postgresql
     registry: "sunbirded.azurecr.io"
     repository: "postgresql"
@@ -202,12 +196,6 @@ internal: &internal
     image: *kafka
     imagePullSecrets:
       - name: "registry-secret-name"
-
-  zookeeper:
-    image: *zookeeper
-    imagePullSecrets:
-      - name: "registry-secret-name"
-
 
   postgresql:
     image: *postgresql
