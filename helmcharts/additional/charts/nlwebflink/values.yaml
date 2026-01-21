@@ -121,12 +121,12 @@ taskmanager:
   prom_port: 9251
   rpc_port: 6122
   heap_memory: 1536
-  replicas: 2
+  replicas: 1
   cpu_requests: 0.5
   flink_work_dir: "/opt/flink"
 
 # Cloud Storage Configuration
-checkpoint_enabled: true
+checkpoint_enabled: false
 checkpoint_store_type: "azure"
 cloud_storage_flink_bucketname: ""
 
@@ -142,12 +142,9 @@ domain_name: &domain_name "localhost"
 proto: &proto "https"
 instance: &instance "dev"
 
-# Kafka Configuration
-kafka_bootstrap_servers: "kafka.sunbird.svc.cluster.local:9092"
-kafka_zookeeper: "zookeeper.sunbird.svc.cluster.local:2181"
 
 # NL Web Specific Configuration
-nlweb_topic: "sb.nlweb_topic"
+nlweb_topic: "{{ .Values.global.env }}.nlweb.ingest"
 nlweb_group_id: "nlweb-flink-group"
 qdrant_endpoint: "http://qdrant:6333"
 api_endpoint: "http://nlweb:8000/load-data"
@@ -203,10 +200,10 @@ log4j_console_properties: |
 # Base Configuration
 base_config: |
   kafka {
-      broker-servers = "{{ .Values.kafka_bootstrap_servers }}"
-      producer.broker-servers = "{{ .Values.kafka_bootstrap_servers }}"
-      consumer.broker-servers = "{{ .Values.kafka_bootstrap_servers }}"
-      zookeeper = "{{ .Values.kafka_zookeeper }}"
+      broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
+      producer.broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
+      consumer.broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
+      zookeeper = ""
       producer {
         max-request-size = {{ .Values.producer_max_request_size }}
         batch.size = {{ .Values.producer_batch_size }}
@@ -251,7 +248,7 @@ flink_jobs:
     config: |+
       include file("/data/flink/conf/base-config.conf")
       kafka {
-        input.topic = "{{ .Values.nlweb_topic }}"
+        input.topic = "{{ include "common.tplvalues.render" (dict "value" .Values.nlweb_topic "context" $) }}"
         groupId = "{{ .Values.nlweb_group_id }}"
       }
       task {
