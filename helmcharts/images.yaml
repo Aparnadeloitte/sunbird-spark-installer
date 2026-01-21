@@ -180,6 +180,11 @@ images:
     repository: yugabyte
     tag: 2025.2.0.0-b131 
 
+  janusgraph: &janusgraph
+    registry: docker.io
+    repository: bitnamilegacy/janusgraph
+    tag: 1.1.0-debian-12-r21 
+
 # Internal block with pull secrets
 internal: &internal
   velero:
@@ -386,6 +391,11 @@ internal: &internal
       - name: "registry-secret-name"
   yugabyte:
     image: *yugabyte
+    imagePullSecrets:
+      - name: "registry-secret-name"
+
+  janusgraph:
+    image: *janusgraph
     imagePullSecrets:
       - name: "registry-secret-name"
 
