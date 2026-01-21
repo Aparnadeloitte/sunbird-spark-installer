@@ -334,16 +334,6 @@ kafka:
       memory: 1024Mi
   persistence:
     size: 10Gi
-  zookeeper:  
-    persistence:
-      size: 2Gi
-    resources:
-      limits:
-        cpu: 256m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
 
 neo4j:
   resources:
