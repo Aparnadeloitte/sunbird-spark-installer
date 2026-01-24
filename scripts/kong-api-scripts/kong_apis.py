@@ -63,7 +63,7 @@ def _save_plugins_for_api(kong_admin_api_url, input_api_details):
         json_request("PATCH", api_pugins_url + "/" + saved_plugin["id"], input_plugin)
 
     for saved_plugin in saved_plugins_to_be_deleted:
-        print("Deleting plugin {} for API {}".format(saved_plugin["name"], api_name));
+        print("Deleting plugin {} for API {}".format(saved_plugin["name"], api_name))
         json_request("DELETE", api_pugins_url + "/" + saved_plugin["id"], "")
 
 def _sanitized_api_data(input_api):

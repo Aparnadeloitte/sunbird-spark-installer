@@ -225,9 +225,9 @@ base_config: |
   port = "{{ .Values.global.yugabyte.port }}"
   }
 
-  neo4j {
-  routePath = "bolt://{{ .Values.global.neo4j.host }}:{{ .Values.global.neo4j.port }}"
-  graph = "domain"
+  janusgraph {
+    route = "janusgraph:8182"
+    graph = "domain"
   }
 
   es {
