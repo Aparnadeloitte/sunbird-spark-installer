@@ -198,6 +198,9 @@ spec:
             - name: empty-dir
               mountPath: /opt/bitnami/janusgraph/ext
               subPath: app-ext-dir
+            - name: empty-dir
+              mountPath: /opt/bitnami/janusgraph/logs
+              subPath: app-logs-dir
             - name: janusgraph-conf
               mountPath: /opt/bitnami/janusgraph/conf
             - name: janusgraph-properties

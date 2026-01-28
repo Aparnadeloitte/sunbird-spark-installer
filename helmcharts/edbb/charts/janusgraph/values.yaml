@@ -25,7 +25,7 @@ global:
   ##
   security:
     ## @param global.security.allowInsecureImages Allows skipping image verification
-    allowInsecureImages: false
+    allowInsecureImages: true
   ## Compatibility adaptations for Kubernetes platforms
   ##
   compatibility:
@@ -170,14 +170,21 @@ extraJanusgraphProperties: |
   graph.storage.cql.local-datacenter = "datacenter1" 
   storage.cql.keyspace=janusgraph
   # Transaction Log Configuration (Required for CDC)
-  tx.log.tx.enabled=true
+  tx.log-tx=true
+  log.tx.backend=default
+  log.tx.key-consistent=true
+  log.tx.read-interval=500
+  graph.txn.log_processor.enable=true
+  graph.txn.log_processor.sinks=LOG
+  graph.txn.log_processor.converter=SUNBIRD_LEGACY
+
 ## @param janusgraphProperties Override the content of the janusgraph.properties file.
 ## NOTE: By providing the content of janusgraph.properties, other settings provided using values may be ignored.
 ##
 janusgraphProperties: ""
 ## @param javaOptions Java options for JanusGraph execution
 ##
-javaOptions: ""
+javaOptions: "-Dlog4j2.configurationFile=/opt/bitnami/janusgraph/conf/log4j2-server.xml -Djanusgraph.log.dir=/opt/bitnami/janusgraph/logs"
 
 ## Bitnami JanusGraph image
 ## ref: https://hub.docker.com/r/bitnami/janusgraph/tags/
@@ -448,14 +455,32 @@ extraEnvVarsSecret: ""
 ## @param extraVolumes Optionally specify extra list of additional volumes for the JanusGraph pod(s)
 ##
 extraVolumes:
+  - name: janusgraph-configs
+    configMap:
+      name: janusgraph-configs
   - name: etc-passwd
     emptyDir: {}
 
 ## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for the JanusGraph container(s)
 ##
 extraVolumeMounts:
+  - name: janusgraph-configs
+    mountPath: /opt/bitnami/janusgraph/scripts/register-cdc.groovy
+    subPath: register-cdc.groovy
+  - name: janusgraph-configs
+    mountPath: /opt/bitnami/janusgraph/scripts/empty-sample.groovy
+    subPath: empty-sample.groovy
   - name: etc-passwd
     mountPath: /etc
+  - name: janusgraph-configs
+    mountPath: /opt/bitnami/janusgraph/conf/janusgraph-cql-server.properties
+    subPath: janusgraph-cql-server.properties
+  - name: janusgraph-configs
+    mountPath: /opt/bitnami/janusgraph/conf/log4j2-server.xml
+    subPath: log4j2-server.xml  
+  - name: janusgraph-configs
+    mountPath: /opt/bitnami/janusgraph/conf/gremlin-server.yaml
+    subPath: gremlin-server.yaml
 
 ## @param sidecars Add additional sidecar containers to the JanusGraph pod(s)
 ## e.g:
