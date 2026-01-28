@@ -226,8 +226,8 @@ base_config: |
   }
 
   janusgraph {
-    route = "janusgraph:8182"
-    graph = "domain"
+  route = "{{ .Values.global.janusgraph.host }}:{{ .Values.global.janusgraph.port }}"
+  graph = "domain"
   }
 
   es {
