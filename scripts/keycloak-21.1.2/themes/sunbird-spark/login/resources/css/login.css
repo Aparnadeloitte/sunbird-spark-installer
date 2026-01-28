@@ -343,11 +343,12 @@ body {
     font-size: 14px;
     color: #ac5039;
     text-decoration: none;
+    height: 16px;
 }
 
 .forgot-password a:hover {
     color: #ac5039;
-    text-decoration: underline;
+    opacity: 0.8;
     cursor: pointer;
 }
 
