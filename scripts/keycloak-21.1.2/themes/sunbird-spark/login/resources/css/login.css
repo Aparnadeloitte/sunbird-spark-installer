@@ -846,3 +846,21 @@ div[class*="kcFormGroupClass"] {
 .toast-error .toast-close:hover {
     background: none;
 }
+
+.passwdchk {
+    display: none;
+}
+.passwderr {
+    display: block;
+    color: #C53030;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+.confpasswderr {
+    color: #C53030;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+.show {
+    display: block;
+}

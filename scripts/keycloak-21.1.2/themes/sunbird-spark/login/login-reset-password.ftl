@@ -89,6 +89,7 @@
                                 <svg id="eye-icon-new" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </span>
                         </div>
+                        <div id="passwd-error-msg" class="ui text passwdchk">Your password must contain a minimum of 8 characters. It must include numerals, lower and upper case alphabets and special characters, without any spaces</div>
                     </div>
 
                     <div class="kc-form-group">
@@ -99,10 +100,11 @@
                                 <svg id="eye-icon-confirm" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </span>
                         </div>
+                        <div id="passwd-match-error-msg" class="ui text confpasswderr hide">Passwords do not match</div>
                     </div>
 
                     <div class="kc-form-buttons">
-                        <button class="kc-button" type="button" onclick="return handleStep3(event)">Reset Password</button>
+                        <button id="login" class="kc-button" type="button" onclick="return handleStep3(event)">Reset Password</button>
                     </div>
                 </form>
             </div>
