@@ -30,7 +30,7 @@
                     <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required oninput="this.value = this.value.replace(/[^0-9]/g, ''); collectOtp()" onkeydown="handleBackspace(this, event)">
                     
                     <!-- Hidden input to store the actual concatenated OTP -->
-                    <input id="totp" name="smsCode" type="hidden" />
+                    <input id="totp" name="smsCode" type="hidden" required pattern="^[0-9]{6}$" />
                 </div>
 
                 <div class="resend-otp-container text-center">
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="kc-form-buttons">
-                    <button class="kc-button block" type="submit" onclick="return collectOtp()">Confirm and Proceed</button>
+                    <button class="kc-button block" type="button" onclick="return handleOtpSubmit(event)">Confirm and Proceed</button>
                 </div>
             </form>
             
@@ -66,7 +66,26 @@
                     let otp = '';
                     inputs.forEach(input => otp += input.value);
                     document.getElementById('totp').value = otp;
+                    if (otp.length < 6) {
+                        if (window.showToast) window.showToast('error', 'Please enter the complete 6-digit code', 5000, 'Error');
+                        return false;
+                    }
                     return true;
+                }
+                function handleOtpSubmit(e) {
+                    e.preventDefault();
+                    if (!collectOtp()) return false;
+                    var form = document.getElementById('kc-totp-login-form');
+                    if (form && form.checkValidity && form.checkValidity()) {
+                        if (form.requestSubmit) form.requestSubmit(); else form.submit();
+                    } else {
+                        if (window.showToast) window.showToast('error', 'Please enter the complete 6-digit code', 5000, 'Error');
+                    }
+                    return false;
+                }
+                function resendOtp() {
+                    var contact = (document.getElementById('username') && document.getElementById('username').value) || '';
+                    if (window.showToast) window.showToast('success', 'A verification code has been sent to ' + String(contact || '').trim(), 5000, 'OTP Sent');
                 }
             </script>
         </div>

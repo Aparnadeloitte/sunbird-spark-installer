@@ -42,12 +42,38 @@
                 </div>
 
                 <div class="kc-form-buttons">
-                    <button class="kc-button" type="submit">Reset Password</button>
+                    <button class="kc-button" type="button" onclick="return handleUpdateSubmit(event)">Reset Password</button>
                 </div>
             </form>
         </div>
 
         <script>
+            function handleUpdateSubmit(e) {
+                e.preventDefault();
+                var p1El = document.getElementById('password-new');
+                var p2El = document.getElementById('password-confirm');
+                var p1 = p1El ? String(p1El.value || '').trim() : '';
+                var p2 = p2El ? String(p2El.value || '').trim() : '';
+                if (!p1) {
+                    if (window.showToast) window.showToast('error', 'Enter New Password');
+                    return false;
+                }
+                if (!p2) {
+                    if (window.showToast) window.showToast('error', 'Confirm New Password');
+                    return false;
+                }
+                if (p1 !== p2) {
+                    if (window.showToast) window.showToast('error', 'Passwords do not match');
+                    return false;
+                }
+                var form = document.getElementById('kc-passwd-update-form');
+                if (form && form.checkValidity && form.checkValidity()) {
+                    if (form.requestSubmit) form.requestSubmit(); else form.submit();
+                } else {
+                    if (window.showToast) window.showToast('error', 'Please fix the highlighted fields');
+                }
+                return false;
+            }
             function togglePassword(id, iconId) {
                 const passwordInput = document.getElementById(id);
                 const eyeIcon = document.getElementById(iconId);

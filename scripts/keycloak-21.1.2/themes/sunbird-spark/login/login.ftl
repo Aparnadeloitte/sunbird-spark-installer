@@ -37,9 +37,9 @@
                     <label for="emailormobile" class="${properties.kcLabelClass!}">Email ID / Mobile Number</label>
 
                     <#if usernameEditDisabled??>
-                        <input tabindex="1" id="emailormobile" class="${properties.kcInputClass!}" name="emailormobile" value="${(login.emailormobile!'')}" type="text" disabled placeholder="Enter Email ID / Mobile Number" />
+                        <input tabindex="1" id="emailormobile" class="${properties.kcInputClass!}" name="username" value="${(login.username!'')}" type="text" disabled placeholder="Enter Email ID / Mobile Number" />
                     <#else>
-                        <input tabindex="1" id="emailormobile" class="${properties.kcInputClass!}" name="emailormobile" value="${(login.emailormobile!'')}" type="text" autofocus autocomplete="off" placeholder="Enter Email ID / Mobile Number" />
+                        <input tabindex="1" id="emailormobile" class="${properties.kcInputClass!}" name="username" value="${(login.username!'')}" type="text" autofocus autocomplete="off" placeholder="Enter Email ID / Mobile Number" />
                     </#if>
                 </div>
 
@@ -63,7 +63,7 @@
                 </div>
 
                 <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
-                    <input tabindex="4" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!} login-button" name="login" id="kc-login" onclick="doLogin(event)" type="submit" value="Login"/>
+                    <input tabindex="4" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!} login-button" name="login" id="kc-login" type="submit" value="Login"/>
                 </div>
             </form>
         </#if>

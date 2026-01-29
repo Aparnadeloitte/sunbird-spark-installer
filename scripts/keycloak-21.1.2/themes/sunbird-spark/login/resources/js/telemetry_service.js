@@ -2481,24 +2481,31 @@ function getRollupData(orgIds) {
 
 function doLogin(e) {
   e.preventDefault();
+  var u = document.getElementById('emailormobile');
+  var p = document.getElementById('password');
+  var errs = [];
+  if (!u || !String(u.value || '').trim()) errs.push('Enter Email ID / Mobile Number');
+  if (!p || !String(p.value || '').trim()) errs.push('Enter Password');
+  if (errs.length) {
+    if (window.showToast) window.showToast('error', errs.join(' • '));
+    return false;
+  }
   logInteractEvent("login");
   logLoginImpressionEvent("pageexit");
   setTimeout(function () {
-    $("#kc-form-login").submit();
-  }, 500);
+    var form = document.getElementById('kc-form-login');
+    if (form && form.requestSubmit) {
+      form.requestSubmit();
+    } else {
+      $("#kc-form-login").submit();
+    }
+  }, 300);
   return false;
 }
 
 $("body").ready(function ($) {
   $(".login-button").click(function (e) {
-    e.preventDefault();
-    logInteractEvent("login");
-    logLoginImpressionEvent("pageexit");
-    setTimeout(function () {
-      $("#kc-form-login").submit();
-    }, 500);
-
-    return false;
+    return doLogin(e);
   })
 
   $("#google-login-button").click(function (e) {
@@ -2972,5 +2979,41 @@ const toggleGoogleSignInBtn = function () {
   const hideGoogleSignInBtn = (googleSignInBtnElement && client_id && isIOS() && ['android', 'ios'].includes(client_id.toLowerCase()));
   hideGoogleSignInBtn && googleSignInBtnElement.classList.add('hide');
 }
+
+/* Toast/Snackbar utility */
+(function ($) {
+  window.showToast = function (type, text, duration, title) {
+    try {
+      var $container = $('.toast-container');
+      if (!$container.length) {
+        $container = $('<div/>', {
+          class: 'toast-container',
+          'aria-live': 'polite',
+          'aria-atomic': 'true'
+        }).appendTo('body');
+      }
+      var cls = 'toast';
+      if (type) {
+        cls += ' toast-' + String(type).toLowerCase();
+      }
+      var $toast = $('<div/>', { class: cls, role: 'status' });
+      var $title = $('<div/>', { class: 'toast-title' }).text(title || (String(type).toLowerCase() === 'error' ? 'Error' : ''));
+      var $msg = $('<div/>', { class: 'toast-message' }).text(text || '');
+      var $close = $('<button/>', { class: 'toast-close', 'aria-label': 'Close', html: '&times;' });
+      $toast.append($title).append($msg).append($close);
+      $container.append($toast);
+      setTimeout(function () { $toast.addClass('show'); }, 10);
+      var hide = function () {
+        $toast.removeClass('show');
+        setTimeout(function () { $toast.remove(); }, 200);
+      };
+      $close.on('click', hide);
+      setTimeout(hide, Number(duration) || 5000);
+      return $toast;
+    } catch (e) {
+      // no-op
+    }
+  };
+})(jQuery);
 
 //})();

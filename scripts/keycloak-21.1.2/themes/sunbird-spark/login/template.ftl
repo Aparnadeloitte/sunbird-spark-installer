@@ -171,6 +171,57 @@
             </div><!-- Close login-split-container -->
         </div><!-- Close login-wrapper -->
     </main>
+    <div class="toast-container"></div>
+    <script type="text/javascript">
+        if (!window.showToast) {
+            window.showToast = function (type, text, duration, title) {
+                try {
+                    var container = document.querySelector('.toast-container');
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.className = 'toast-container';
+                        container.setAttribute('aria-live', 'polite');
+                        container.setAttribute('aria-atomic', 'true');
+                        document.body.appendChild(container);
+                    }
+                    var cls = 'toast';
+                    if (type) cls += ' toast-' + String(type).toLowerCase();
+                    var toast = document.createElement('div');
+                    toast.className = cls;
+                    toast.setAttribute('role', 'status');
+                    var t = document.createElement('div');
+                    t.className = 'toast-title';
+                    t.textContent = title || (String(type).toLowerCase() === 'error' ? 'Error' : '');
+                    var msg = document.createElement('div');
+                    msg.className = 'toast-message';
+                    msg.textContent = text || '';
+                    var close = document.createElement('button');
+                    close.className = 'toast-close';
+                    close.setAttribute('aria-label', 'Close');
+                    close.innerHTML = '&times;';
+                    toast.appendChild(t);
+                    toast.appendChild(msg);
+                    toast.appendChild(close);
+                    container.appendChild(toast);
+                    setTimeout(function () { toast.classList.add('show'); }, 10);
+                    var hide = function () {
+                        toast.classList.remove('show');
+                        setTimeout(function () { toast.remove(); }, 200);
+                    };
+                    close.addEventListener('click', hide);
+                    setTimeout(hide, Number(duration) || 5000);
+                    return toast;
+                } catch (e) { /* no-op */ }
+            };
+        }
+    </script>
+    <#if displayMessage && message?has_content>
+    <script type="text/javascript">
+        if (window.showToast) {
+            window.showToast('${message.type}', '${message.summary?js_string}');
+        }
+    </script>
+    </#if>
 </body>
 </html>
 </#macro>

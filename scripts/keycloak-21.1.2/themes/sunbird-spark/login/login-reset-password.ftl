@@ -20,7 +20,7 @@
                     </div>
                 </#if>
 
-                <form id="kc-reset-password-form" method="post" onsubmit="return handleStep1(event)">
+                <form id="kc-reset-password-form" method="post">
                     <div class="kc-form-group">
                         <label for="username" class="kc-label">Email ID / Mobile Number*</label>
                         <div class="input-wrapper">
@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="kc-form-buttons">
-                        <button id="login" class="kc-button" type="submit">Continue</button>
+                        <button id="login" class="kc-button" type="button" onclick="return handleStep1(event)">Continue</button>
                     </div>
                 </form>
             </div>
@@ -48,7 +48,7 @@
 
                 <p class="otp-validity-text text-center">OTP is valid for 30 minutes</p>
 
-                <form id="kc-totp-login-form" method="post" onsubmit="return handleStep2(event)">
+                <form id="kc-totp-login-form" method="post">
                     <div class="otp-container">
                         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required oninput="this.value = this.value.replace(/[^0-9]/g, ''); focusNext(this)" onkeydown="handleBackspace(this, event)">
                         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required oninput="this.value = this.value.replace(/[^0-9]/g, ''); focusNext(this)" onkeydown="handleBackspace(this, event)">
@@ -58,7 +58,7 @@
                         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required oninput="this.value = this.value.replace(/[^0-9]/g, ''); collectOtp()" onkeydown="handleBackspace(this, event)">
                         
                         <!-- Hidden input to store the actual concatenated OTP -->
-                        <input id="totp" name="smsCode" type="hidden" />
+                        <input id="totp" name="smsCode" type="hidden" required pattern="^[0-9]{6}$" />
                     </div>
 
                     <div class="resend-otp-container text-center">
@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="kc-form-buttons">
-                        <button class="kc-button block" type="submit">Confirm and Proceed</button>
+                        <button class="kc-button block" type="button" onclick="return handleStep2(event)">Confirm and Proceed</button>
                     </div>
                 </form>
             </div>
@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="kc-form-buttons">
-                        <button class="kc-button" type="submit">Reset Password</button>
+                        <button class="kc-button" type="button" onclick="return handleStep3(event)">Reset Password</button>
                     </div>
                 </form>
             </div>
@@ -128,25 +128,36 @@
             // === STEP HANDLERS ===
             function handleStep1(e) {
                 e.preventDefault();
-                // Simulation: Assume valid and move to step 2
+                var u = document.getElementById('username');
+                var n = document.getElementById('name');
+                var errs = [];
+                if (!u || !String(u.value || '').trim()) errs.push('Enter Email ID / Mobile Number');
+                if (!n || !String(n.value || '').trim()) errs.push('Enter Name');
+                if (errs.length) {
+                    if (window.showToast) window.showToast('error', errs.join(' • '), 5000, 'Error');
+                    return false;
+                }
+                window.__contactIdentifier = String(u.value || '').trim();
                 document.getElementById('step-1').classList.add('hide');
                 document.getElementById('step-2').classList.remove('hide');
-                
-                // Focus on first OTP digit
-                setTimeout(() => {
-                    const firstOtp = document.querySelector('.otp-input');
-                    if(firstOtp) firstOtp.focus();
+                setTimeout(function () {
+                    var firstOtp = document.querySelector('.otp-input');
+                    if (firstOtp) firstOtp.focus();
                 }, 100);
-                
+                if (window.showToast) {
+                    var contact = window.__contactIdentifier || '';
+                    window.showToast('success', 'A verification code has been sent to ' + contact, 5000, 'OTP Sent');
+                }
                 return false;
             }
 
             function handleStep2(e) {
                 e.preventDefault();
-                if(collectOtp()){
-                     // Simulation: Assume valid OTP and move to step 3
+                if (collectOtp()) {
                     document.getElementById('step-2').classList.add('hide');
                     document.getElementById('step-3').classList.remove('hide');
+                } else {
+                    if (window.showToast) window.showToast('error', 'Please enter the complete 6-digit code', 5000, 'Error');
                 }
                 return false;
             }
@@ -155,12 +166,21 @@
                 e.preventDefault();
                 var p1 = document.getElementById('password-new').value;
                 var p2 = document.getElementById('password-confirm').value;
-                if (!p1 || p1 !== p2) {
+                if (!String(p1 || '').trim()) {
+                    if (window.showToast) window.showToast('error', 'Enter New Password', 5000, 'Error');
+                    return false;
+                }
+                if (p1 !== p2) {
+                    if (window.showToast) window.showToast('error', 'Passwords do not match', 5000, 'Error');
                     return false;
                 }
                 document.getElementById('step-3').classList.add('hide');
                 document.getElementById('reset-success').classList.remove('hide');
                 return false;
+            }
+            function resendOtp() {
+                var contact = window.__contactIdentifier || (document.getElementById('username') && document.getElementById('username').value) || '';
+                if (window.showToast) window.showToast('success', 'A verification code has been sent to ' + String(contact || '').trim(), 5000, 'OTP Sent');
             }
 
             // === OTP LOGIC ===
