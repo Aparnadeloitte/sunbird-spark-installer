@@ -772,3 +772,77 @@ div[class*="kcFormGroupClass"] {
 .mb-4 {
     margin-bottom: 1rem;
 }
+
+/* Toast/Snackbar */
+.toast-container {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 9999;
+    pointer-events: none;
+}
+.toast {
+    min-width: 280px;
+    max-width: 360px;
+    background: #2D3748;
+    color: #111;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    padding: 12px 40px 12px 12px;
+    line-height: 1.4;
+    font-size: 14px;
+    transform: translateY(8px);
+    opacity: 0;
+    transition: opacity .2s ease, transform .2s ease;
+    pointer-events: auto;
+    position: relative;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.toast-success {
+    background: #EDEBE3;
+    color: #111;
+}
+.toast-error {
+    background: #EF4343;
+    color: #fff;
+}
+.toast-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.toast-message {
+    display: block;
+}
+.toast-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #111;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+.toast-close:hover {
+    background: none;
+}
+.toast:hover .toast-close {
+    opacity: 1;
+}
+.toast-error .toast-close {
+    color: #fff;
+    background: none;
+}
+.toast-error .toast-close:hover {
+    background: none;
+}
