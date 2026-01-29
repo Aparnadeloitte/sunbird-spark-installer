@@ -76,7 +76,7 @@
                 <h1 class="page-title">Set New Password</h1>
                 <p class="page-subtitle">Create a strong password to secure your account.</p>
 
-                <form id="kc-passwd-update-form" action="${url.loginAction}" method="post">
+                <form id="kc-passwd-update-form" action="${url.loginAction}" method="post" onsubmit="return handleStep3(event)">
                     <!-- Keep hidden inputs to satisfy Keycloak form requirements if needed later -->
                     <input type="text" id="username-hidden" name="username" style="display:none;"/>
                     <input type="password" id="password-hidden" name="password" autocomplete="current-password" style="display:none;"/>
@@ -105,6 +105,17 @@
                         <button class="kc-button" type="submit">Reset Password</button>
                     </div>
                 </form>
+            </div>
+            
+            <div id="reset-success" class="hide">
+                <h1 class="page-title">Congratulations!</h1>
+                <p class="page-subtitle">Your password has been successfully reset.</p>
+                <div class="success-icon" aria-hidden="true">
+                    <img src="${url.resourcesPath}/img/right-stroke.svg" alt="Success" class="success-check" />
+                </div>
+                <div class="kc-form-buttons">
+                    <button class="kc-button block" type="button" onclick="window.location.href='${url.loginUrl}'">Proceed to Login</button>
+                </div>
             </div>
             
         </div>
@@ -137,6 +148,18 @@
                     document.getElementById('step-2').classList.add('hide');
                     document.getElementById('step-3').classList.remove('hide');
                 }
+                return false;
+            }
+            
+            function handleStep3(e) {
+                e.preventDefault();
+                var p1 = document.getElementById('password-new').value;
+                var p2 = document.getElementById('password-confirm').value;
+                if (!p1 || p1 !== p2) {
+                    return false;
+                }
+                document.getElementById('step-3').classList.add('hide');
+                document.getElementById('reset-success').classList.remove('hide');
                 return false;
             }
 

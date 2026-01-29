@@ -353,17 +353,20 @@ body {
     color: white !important;
     font-size: 16px !important;
     font-weight: 500 !important;
-    padding: 12px 24px !important;
+    padding: 16px 24px !important;
     border-radius: 16px !important;
     width: 100%;
+    cursor: pointer !important;
     transition: background-color 0.2s ease;
 }
 
 .login-button:hover {
-    background-color: #8d3f2d !important;
-    border-color: #8d3f2d !important;
+    opacity: 0.85 !important;
+    background-color: #ac5039 !important;
+    border-color: #ac5039 !important;
     border: none !important;
     box-shadow: none !important;
+    cursor: pointer !important;
 }
 
 /* Registration Link */
@@ -605,24 +608,74 @@ div[class*="kcFormGroupClass"] {
 
 .kc-button {
     width: 100%;
-    padding: 18px;
-    background: #A73A24;
+    padding: 16px 24px;
+    background: #ac5039;
     color: white;
     border: none;
-    border-radius: 20px;
-    /* Consistent with input rounding */
-    font-size: 1.15rem;
+    border-radius: 16px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
     margin-top: 15px;
-    box-shadow: 0 6px 15px rgba(167, 58, 36, 0.3);
+    box-shadow: none;
 }
 
 .kc-button:hover {
-    background: #8E311F;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(167, 58, 36, 0.4);
+    opacity: 0.85;
+    background: #ac5039;
+    transform: none;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+#reset-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+    min-height: 360px;
+}
+
+#reset-success .kc-form-buttons {
+    display: block;
+    width: 100%;
+}
+
+#reset-success .kc-button {
+    display: block;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+#reset-success .kc-button:hover {
+    text-decoration: none;
+    opacity: 0.85;
+    box-shadow: none;
+    transform: none;
+    background: #ac5039;
+}
+
+.success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-color: #2ECC71;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.success-check {
+    width: 36px;
+    height: 36px;
+    filter: brightness(0) invert(1);
 }
 
 .alert {
