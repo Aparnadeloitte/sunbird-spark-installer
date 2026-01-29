@@ -78,7 +78,7 @@ body {
     flex-direction: column;
     width: 100%;
     max-width: 64rem;
-    min-height: 520px;
+    min-height: max(520px, calc(100vh - 80px));
     margin: 40px auto;
     border-radius: 1.5rem;
     overflow: hidden;
@@ -154,6 +154,7 @@ body {
 }
 
 .login-card {
+    height: 100%;
     width: 100%;
     position: relative;
     background: #fff;

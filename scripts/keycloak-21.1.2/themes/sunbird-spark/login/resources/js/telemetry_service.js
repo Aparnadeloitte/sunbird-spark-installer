@@ -1866,7 +1866,7 @@ var TelemetrySyncManager = {
       headers: headersParam,
       data: JSON.stringify(telemetryObj)
     }).done(function (resp) {
-      console.log("Telemetry API success", resp);
+      console.log("Telemetry API success");
     }).fail(function (error, textStatus, errorThrown) {
       instance.updateEventStack(telemetryData);
       if (error.status == 403) {

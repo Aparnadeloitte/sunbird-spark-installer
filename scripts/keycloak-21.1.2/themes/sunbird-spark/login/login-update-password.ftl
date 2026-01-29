@@ -64,9 +64,4 @@
         <style>
             .hide { display: none !important; }
         </style>
-    <#elseif section = "info" >
-        <div id="kc-registration" class="registration-link">
-            <span><a href="${url.loginUrl}">${msg("backToLogin")}</a></span>
-        </div>
-    </#if>
 </@layout.registrationLayout>

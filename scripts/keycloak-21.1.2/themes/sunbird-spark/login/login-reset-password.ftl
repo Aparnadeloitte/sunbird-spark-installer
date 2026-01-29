@@ -39,10 +39,6 @@
                         <button id="login" class="kc-button" type="submit">Continue</button>
                     </div>
                 </form>
-                
-                <div class="back-to-login">
-                    <a href="${url.loginUrl}">${msg("backToLogin")}</a>
-                </div>
             </div>
 
             <!-- STEP 2: VERIFY OTP (Initially Hidden) -->
