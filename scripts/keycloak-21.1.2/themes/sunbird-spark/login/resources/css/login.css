@@ -12,6 +12,11 @@ body {
     overflow-x: hidden;
 }
 
+/* Utility: Hide class used by login scripts to toggle visibility */
+.hide {
+    display: none !important;
+}
+
 /* Split Screen Layout */
 .login-main {
     min-height: 100vh;
