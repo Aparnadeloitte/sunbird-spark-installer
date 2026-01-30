@@ -2840,29 +2840,7 @@ var redirect = (redirectUrlPath) => {
     redirectToLib();
   }
 };
-var handleSsoEvent = () => {
-  const ssoPath = '/sign-in/sso/select-org';
-  const curUrlObj = window.location;
-  let redirect_uri = getValueFromSession('redirect_uri');
-  let client_id = (new URLSearchParams(curUrlObj.search)).get('client_id');
-  const sessionUrl = sessionStorage.getItem('session_url');
-  if (sessionUrl) {
-    const sessionUrlObj = new URL(sessionUrl);
-    if (redirect_uri) {
-      const redirect_uriLocation = new URL(redirect_uri);
-      if (client_id === 'android') {
-        const ssoUrl = sessionUrlObj.protocol + '//' + sessionUrlObj.host + ssoPath;
-        window.location.href = redirect_uri + '?ssoUrl=' + ssoUrl;
-      } else {
-        window.location.href = redirect_uriLocation.protocol + '//' + redirect_uriLocation.host + ssoPath;
-      }
-    } else {
-      redirectToLib();
-    }
-  } else {
-    redirectToLib();
-  }
-};
+
 var handleGoogleAuthEvent = () => {
   const googleAuthUrl = '/google/auth';
   const curUrlObj = window.location;
