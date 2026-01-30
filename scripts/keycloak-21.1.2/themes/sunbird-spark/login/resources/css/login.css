@@ -116,10 +116,10 @@ body {
 
 .left-panel-title {
     font-size: 30px;
-    font-weight: 700;
+    font-weight: 600;
     color: white;
-    line-height: 1.2;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 42px;
+    font-style: semibold;
 }
 
 /* Right Panel - Login Card */
@@ -151,17 +151,19 @@ body {
     border: none;
     cursor: pointer;
     padding: 8px;
-    color: #999;
+    color: #333333;
     transition: color 0.2s ease;
     z-index: 10;
 }
 
 .close-button:hover {
-    color: #333;
+    color: #333333;
 }
 
 .close-button svg {
     display: block;
+    fill: #333333;
+    stroke: #333333;
 }
 
 /* Container Adjustments for Split Layout */
@@ -203,15 +205,20 @@ body {
 }
 
 .welcome-title {
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 600;
-    color: #333;
+    font-style: semibold;
+    color: #222222;
+    line-height: 30px;
     margin: 0 0 8px 0;
 }
 
 .welcome-subtitle {
     font-size: 14px;
-    color: hsl(210 11% 45%);
+    font-weight: 400;
+    font-style: regular;
+    line-height: 100%;
+    color: #757575;
     margin: 0;
     line-height: 1.5;
 }
@@ -256,7 +263,7 @@ body {
     align-items: center;
     text-align: center;
     margin: 20px 0;
-    color: #999;
+    color: #222222;
     font-size: 14px;
 }
 
@@ -264,7 +271,7 @@ body {
 .or-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #BBBBBB;
 }
 
 .or-divider span {
@@ -311,22 +318,25 @@ body {
 }
 
 .forgot-password a {
+    font-weight: 500;
+    font-style: medium;
+    line-height: 100%;
     font-size: 14px;
-    color: #ac5039;
+    color: #A85236;
     text-decoration: none;
     height: 16px;
 }
 
 .forgot-password a:hover {
-    color: #ac5039;
+    color: #A85236;
     opacity: 0.8;
     cursor: pointer;
 }
 
 /* Login Button */
 .login-button {
-    background-color: #ac5039 !important;
-    border-color: #ac5039 !important;
+    background-color: #A85236 !important;
+    border-color: #A85236 !important;
     border: none !important;
     box-shadow: none !important;
     color: white !important;
@@ -341,8 +351,8 @@ body {
 
 .login-button:hover {
     opacity: 0.85 !important;
-    background-color: #ac5039 !important;
-    border-color: #ac5039 !important;
+    background-color: #A85236 !important;
+    border-color: #A85236 !important;
     border: none !important;
     box-shadow: none !important;
     cursor: pointer !important;
@@ -350,16 +360,22 @@ body {
 
 /* Registration Link */
 .registration-link {
+    font-weight: 400;
+    font-size: 14px;
+    font-style: regular;
+    line-height: 100%;
     text-align: center;
     margin-top: 20px;
-    font-size: 14px;
-    color: #666;
+    color: #222222;
 }
 
 .registration-link a {
-    color: #ac5039;
+    color: #A85236;
     text-decoration: none;
     font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    font-style: medium;
 }
 
 .registration-link a:hover {
@@ -377,21 +393,47 @@ input[type="password"] {
     width: 100%;
 }
 
+/* Placeholder color */
+input[type="text"]::placeholder,
+input[type="password"]::placeholder,
+.kc-input::placeholder {
+    color: #B2B2B2 !important;
+    opacity: 1;
+}
+/* WebKit */
+input[type="text"]::-webkit-input-placeholder,
+input[type="password"]::-webkit-input-placeholder,
+.kc-input::-webkit-input-placeholder {
+    color: #B2B2B2 !important;
+}
+/* Firefox */
+input[type="text"]::-moz-placeholder,
+input[type="password"]::-moz-placeholder,
+.kc-input::-moz-placeholder {
+    color: #B2B2B2 !important;
+}
+/* Edge/IE */
+input[type="text"]:-ms-input-placeholder,
+input[type="password"]:-ms-input-placeholder,
+.kc-input:-ms-input-placeholder {
+    color: #B2B2B2 !important;
+}
+
 input[type="text"]:focus,
 input[type="password"]:focus {
-    border-color: #ac5039 !important;
+    border-color: #A85236 !important;
     outline: none !important;
     background: white !important;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #ac5039 !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #A85236 !important;
     border-radius: 16px !important;
 }
 
 /* Apply the same precise double-border effect on hover for consistency */
 input[type="text"]:hover,
 input[type="password"]:hover {
-    border-color: #A73A24 !important;
+    border-color: #A85236 !important;
     background: white !important;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #A73A24 !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #A85236 !important;
     border-radius: 16px !important;
 }
 
@@ -432,7 +474,10 @@ div[class*="kcFormGroupClass"] {
     }
 
     .left-panel-title {
-        font-size: 36px;
+        font-size: 30px;
+        line-height: 42px;
+        font-weight: 600;
+        font-style: semibold;
     }
 }
 
@@ -478,7 +523,7 @@ div[class*="kcFormGroupClass"] {
 /* Appended Styles from login1.css for Reset Password Page */
 
 :root {
-    --primary-color: #A73A24;
+    --primary-color: #A85236;
     --primary-hover: #8E311F;
     --teal-bg: #4F8A8B;
     --card-bg: #ffffff;
@@ -495,7 +540,7 @@ div[class*="kcFormGroupClass"] {
 .sunbird-logo-text {
     font-size: 2.2rem;
     font-weight: 700;
-    color: #A73A24;
+    color: #A85236;
     letter-spacing: -1.5px;
 }
 
@@ -561,10 +606,10 @@ div[class*="kcFormGroupClass"] {
 .kc-input:hover,
 .kc-input:focus {
     outline: none;
-    border-color: #A73A24;
+    border-color: #A85236;
     background: white;
     /* Precise double border: Main Border -> White Gap -> Second Border */
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #A73A24;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #A85236;
     border-radius: 16px;
 }
 
@@ -587,7 +632,7 @@ div[class*="kcFormGroupClass"] {
 .kc-button {
     width: 100%;
     padding: 16px 24px;
-    background: #ac5039;
+    background: #A85236;
     color: white;
     border: none;
     border-radius: 16px;
@@ -601,7 +646,7 @@ div[class*="kcFormGroupClass"] {
 
 .kc-button:hover {
     opacity: 0.85;
-    background: #ac5039;
+    background: #A85236;
     transform: none;
     box-shadow: none;
     cursor: pointer;
@@ -635,7 +680,7 @@ div[class*="kcFormGroupClass"] {
     opacity: 0.85;
     box-shadow: none;
     transform: none;
-    background: #ac5039;
+    background: #A85236;
 }
 
 .kc-form-buttons {
@@ -718,7 +763,7 @@ div[class*="kcFormGroupClass"] {
 }
 
 .otp-input:focus {
-    border-color: #A73A24 !important;
+    border-color: #A85236 !important;
     box-shadow: 0 0 0 2px rgba(167, 58, 36, 0.2) !important;
     outline: none !important;
 }
@@ -737,7 +782,7 @@ div[class*="kcFormGroupClass"] {
 }
 
 .resend-otp-container a {
-    color: #A73A24;
+    color: #A85236;
     text-decoration: none;
     font-weight: 600;
 }
