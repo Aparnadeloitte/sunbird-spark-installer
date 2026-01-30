@@ -31,35 +31,12 @@ body {
     width: 100%;
     min-height: 100vh;
     background-color: rgb(74, 140, 140);
+    background-image: url('../img/auth-wave-bg.png');
+    background-size: cover;
+    background-position: center;
 }
 
-.login-wrapper::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 40%;
-    left: 0;
-    bottom: 0;
-    background-image: url('../img/wave-background1.svg');
-    background-size: 100% 100%;
-    background-position: bottom left;
-    background-repeat: no-repeat;
-    opacity: 0.3;
-}
-
-.login-wrapper::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 40%;
-    left: 0;
-    bottom: 0;
-    background-image: url('../img/wave-background2.svg');
-    background-size: 100% 100%;
-    background-position: bottom left;
-    background-repeat: no-repeat;
-    opacity: 0.2;
-}
+ 
 
 /* Utility classes requested */
 .opacity-30 {
@@ -84,12 +61,11 @@ body {
     width: 100%;
     max-width: 64rem;
     min-height: max(520px, calc(100vh - 80px));
-    margin: 40px auto;
-    border-radius: 1.5rem;
+    margin: 10px auto;
+    border-radius: 3rem;
     overflow: hidden;
     position: relative;
     z-index: 10;
-    background-color: rgb(74, 140, 140);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
@@ -107,30 +83,28 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem 0 2rem 2rem;
     overflow: hidden;
-    background-image: url('../img/auth-wave-bg.png');
-    background-size: cover;
-    background-position: center;
-    border: white;
-    border-style: solid;
-    border-radius: 1.5rem 0 0 1.5rem;
+    border: var(--card-bg);
+    box-shadow: none;
+    border-width: 2px;
+    border-radius: 3rem 0 0 3rem;
 }
 
 .login-left-panel-container {
     box-sizing: border-box;
     border-style: solid;
-    border-left: 3px solid rgba(255, 255, 255, 0.7);
-    border-top: 3px solid rgba(255, 255, 255, 0.7);
-    border-bottom: 3px solid rgba(255, 255, 255, 0.7);
-    border-right: none;
+    border-width: 3px 0 3px 3px;
+    border-color: var(--card-bg);
+    box-shadow: 0 0 0 2rem var(--card-bg) !important;
+    z-index: 3;
     position: relative;
     width: 100%;
     height: 100%;
     align-self: stretch;
-    border-radius: 24px 0 0 24px;
-    padding: 8px;
+    border-radius: 3rem;
 }
+
+
 
 .left-panel-content {
     position: absolute;
@@ -162,8 +136,8 @@ body {
     height: 100%;
     width: 100%;
     position: relative;
-    background: #fff;
-    border-radius: 0 24px 24px 0;
+    background: var(--card-bg);
+    border-radius: 0 3rem 3rem 0;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     padding: 48px;
 }
@@ -510,7 +484,6 @@ div[class*="kcFormGroupClass"] {
     --card-bg: #ffffff;
     --text-color: #2D3748;
     --text-secondary: #718096;
-    --border-color: #E2E8F0;
     --font-family: 'Inter', sans-serif;
 }
 
