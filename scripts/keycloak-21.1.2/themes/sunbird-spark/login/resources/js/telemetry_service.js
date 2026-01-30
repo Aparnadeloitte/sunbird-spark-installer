@@ -1949,40 +1949,6 @@ var Telemetry = (function () {
   this.ajv = new Ajv({ schemas: telemetrySchema });
 
   /**
-   * Which is used to initialize the telemetry event
-   * @param  {object} config - Configurations for the telemetry lib to initialize the service. " Example: config = { batchsize:10,host:"" } "
-   */
-  this.telemetry.initialize = function (config) {
-    instance.init(config);
-  }
-
-  /**
-   * Which is used to start and initialize the telemetry event.
-   * If the telemetry is already initialzed then it will trigger only start event.
-   * @param  {object} config     [Telemetry lib configurations]
-   * @param  {string} contentId  [Content Identifier]
-   * @param  {string} contentVer [Content version]
-   * @param  {object} data       [Can have userAgent,device spec object]
-   * @param  {object} options    [It can have `context, object, actor` can be explicitly passed in this event]
-   */
-  this.telemetry.start = function (config, contentId, contentVer, data, options) {
-    data.duration = data.duration || (((new Date()).getTime()) * 0.001); // Converting duration miliSeconds to seconds
-    if (contentId && contentVer) {
-      telemetryInstance._globalObject.id = contentId;
-      telemetryInstance._globalObject.ver = contentVer;
-    }
-
-    if (!Telemetry.initialized && config) {
-      instance.init(config, contentId, contentVer)
-
-    }
-    instance.updateValues(options);
-    var startEventObj = instance.getEvent('START', data);
-    instance._dispatch(startEventObj)
-    telemetryInstance.startData.push(JSON.parse(JSON.stringify(startEventObj)));
-  }
-
-  /**
    * Which is used to log the impression telemetry event.
    * @param  {object} data       [data which is need to pass in this event ex: {"type":"player","mode":"ContentPlayer","pageid":"splash"}]
    * @param  {object} options    [It can have `context, object, actor` can be explicitly passed in this event]
@@ -2000,22 +1966,6 @@ var Telemetry = (function () {
   this.telemetry.interact = function (data, options) {
     instance.updateValues(options);
     instance._dispatch(instance.getEvent('INTERACT', data));
-  }
-
-  /**
-   * Which is used to log the end telemetry event.
-   * @param  {object} data       [data which is need to pass in this event ex: {"type":"player","mode":"ContentPlayer","pageid":"splash"}]
-   * @param  {object} options    [It can have `context, object, actor` can be explicitly passed in this event]
-   */
-  this.telemetry.end = function (data, options) {
-    if (telemetryInstance.startData.length) {
-      var startEventObj = telemetryInstance.startData.pop();
-      data.duration = ((new Date()).getTime() - startEventObj.ets) * 0.001; // Converting duration miliSeconds to seconds
-      instance.updateValues(options);
-      instance._dispatch(instance.getEvent('END', data));
-    } else {
-      console.info("Please invoke start before invoking end event.")
-    }
   }
 
   /**
