@@ -1,19 +1,20 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout; section>
+<@layout.registrationLayout displayMessage=false; section>
     <#if section = "form">
-        <div class="spark-form-pane validation-pane">
+        <div class="spark-form-pane">
             <div class="sunbird-logo-wrapper">
                 <img src="${url.resourcesPath}/img/sunbird-logo.png" alt="Sunbird" class="sunbird-logo-img" onerror="this.src='https://raw.githubusercontent.com/sunbird-ed/sunbird-ed-portal/master/src/assets/images/sunbird_logo.png'">
             </div>
-            <h1 class="page-title text-center">Verification Error</h1>
+            <h1 class="page-title">${msg("errorTitle")! "We're sorry..."}</h1>
             <#if message?has_content>
-                <div class="alert alert-${message.type} text-center mb-4">
+                <div class="alert alert-error">
                     <span class="kc-feedback-text">${message.summary}</span>
                 </div>
             </#if>
-            <p class="page-subtitle text-center">Please request a new code and try again.</p>
             <div class="kc-form-buttons">
-                <a class="kc-button" href="${url.loginAction}">${msg("doClickHere")! "Back"}</a>
+                <#if client?? && client.baseUrl?has_content>
+                    <a id="backToApplication" class="kc-button" href="${client.baseUrl}">${msg("backToApplication")}</a>
+                </#if>
             </div>
         </div>
     </#if>
