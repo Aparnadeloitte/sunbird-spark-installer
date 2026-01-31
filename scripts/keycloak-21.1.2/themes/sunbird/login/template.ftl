@@ -44,7 +44,7 @@
                     <div class="login-left-panel-container">
                     <div class="background-pattern" style="background-image: url('${url.resourcesPath}/img/auth-wave-bg.png');"></div>
                     <div class="left-panel-content">
-                        <h2 class="left-panel-title">Empower your future through learning.</h2>
+                        <h2 class="left-panel-title">Empower your future<br/>through learning.</h2>
                     </div>
                     </div>
                 </div>

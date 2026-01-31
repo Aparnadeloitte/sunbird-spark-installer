@@ -493,16 +493,26 @@ div[class*="kcFormGroupClass"] {
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
-    .login-right-panel {
-        flex: 1 1 50%;
+/* @media (max-width: 1440px) {
+    .login-left-panel {
+        display: none;
     }
-
-    .left-panel-title {
-        font-size: 30px;
-        line-height: 42px;
-        font-weight: 600;
-        font-style: semibold;
+    .login-right-panel {
+        flex: 1 1 100%;
+    }
+    .login-card {
+        border-radius: 3rem;
+    }
+} */
+@media (max-width: 1024px) {
+    .login-left-panel {
+        display: none;
+    }
+    .login-right-panel {
+        flex: 1 1 100%;
+    }
+    .login-card {
+        border-radius: 3rem;
     }
 }
 
