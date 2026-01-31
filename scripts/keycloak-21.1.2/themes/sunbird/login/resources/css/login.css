@@ -408,6 +408,7 @@ body {
 
 .registration-link a:hover {
     text-decoration: underline;
+    cursor: pointer;
 }
 
 /* Form Input Styling */
