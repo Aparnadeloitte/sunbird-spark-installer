@@ -70,16 +70,19 @@ images:
     tag: "release-3.9.0_RC1_01339f9_07941f0_1_router"
 
   kong: &kong
-    repository: "sunbirded.azurecr.io/kong"
-    tag: "0.14.1"
+    registry: "docker.io"
+    repository: "kong"
+    tag: "3.9.1"
 
   kong_apis: &kong_apis
-    repository: "sunbirded.azurecr.io/kong-scripts"
-    tag: "0.1.8"
+    registry: "docker.io"
+    repository: "divyagovindaiah123/kongapisworking"
+    tag: "0.0.3"
 
   kong_consumer: &kong_consumer
-    repository: "sunbirded.azurecr.io/kong-consumer"
-    tag: "0.1.8"
+    registry: "docker.io"
+    repository: "divyagovindaiah123/kongapisworking"
+    tag: "0.0.3"
   knowledge_mw: &knowledge_mw
     repository: "ghcr.io/sunbird-knowlg/knowledge-mw-service"
     tag: "release-8.1.0_rc2_0c57074_10"
@@ -147,7 +150,7 @@ images:
 
   knowlg: &knowlg
     repository: "snt1/knowledge-service"
-    tag: "v.0.0.21"
+    tag: "v.0.0.32"
 
   dial: &dial
     repository: "ghcr.io/sunbird-knowlg/sunbird-dial-service"
@@ -267,7 +270,7 @@ internal: &internal
     imagePullSecrets:
       - name: "registry-secret-name"
 
-  kong-consumer:
+  kong-consumers:
     image: *kong_consumer
     imagePullSecrets:
       - name: "registry-secret-name"

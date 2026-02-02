@@ -15,7 +15,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-          - "timeout 300 sh -c 'until nc -z {{.Values.global.yugabyte.host}} {{.Values.global.yugabyte.postgresql_port}}; do echo waiting for yugabytepostgres; sleep 10; done'"
+          - |
+            timeout 600 sh -c '
+            until nc -z {{.Values.global.yugabyte.host}} {{.Values.global.yugabyte.postgresql_port}}; do echo waiting for yugabytepostgres; sleep 10; done'
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -26,8 +28,13 @@ spec:
           args:
             - |
               echo "Starting migrations..."
+              kong migrations bootstrap --v
               kong migrations up --v
+              kong migrations finish --v
+              kong migrations up
           env:
+            - name: KONG_PG_MAX_CONCURRENT_QUERIES
+              value: "1"
             - name: KONG_DATABASE
               value: {{ .Values.kong_database }}
             - name: KONG_PG_DATABASE
