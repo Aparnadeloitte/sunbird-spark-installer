@@ -2431,15 +2431,6 @@ function getRollupData(orgIds) {
 
 function doLogin(e) {
   e.preventDefault();
-  // var u = document.getElementById('emailormobile');
-  // var p = document.getElementById('password');
-  // var errs = [];
-  // if (!u || !String(u.value || '').trim()) errs.push('Enter Email ID / Mobile Number');
-  // if (!p || !String(p.value || '').trim()) errs.push('Enter Password');
-  // if (errs.length) {
-  //   if (window.showToast) window.showToast('error', errs.join(' • '));
-  //   return false;
-  // }
   logInteractEvent("login");
   logLoginImpressionEvent("pageexit");
   setTimeout(function () {

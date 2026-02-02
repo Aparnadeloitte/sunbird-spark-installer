@@ -17,8 +17,8 @@
             <meta name="${meta?split('==')[0]}" content="${meta?split('==')[1]}"/>
         </#list>
     </#if>
-    <title><#nested "title"></title>
-    <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
+    <title>Log in to Sunbird</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="${url.resourcesPath}/img/fav.png" />
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
