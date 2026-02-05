@@ -481,6 +481,9 @@ extraVolumeMounts:
   - name: janusgraph-configs
     mountPath: /opt/bitnami/janusgraph/conf/gremlin-server.yaml
     subPath: gremlin-server.yaml
+  - name: janusgraph-configs
+    mountPath: /opt/bitnami/janusgraph/conf/janusgraph-cql.properties
+    subPath: janusgraph-cql.properties  
 
 ## @param sidecars Add additional sidecar containers to the JanusGraph pod(s)
 ## e.g:
@@ -492,7 +495,23 @@ extraVolumeMounts:
 ##       - name: portname
 ##         containerPort: 1234
 ##
-sidecars: []
+sidecars:
+  - name: logstash
+    image: logstash:6.8.21
+    imagePullPolicy: Always
+    env:
+      - name: PIPELINE_WORKERS
+        value: "1"
+      - name: PIPELINE_BATCH_SIZE
+        value: "1"
+    volumeMounts:
+      - name: janusgraph-configs
+        mountPath: /usr/share/logstash/pipeline/logstash.conf
+        subPath: logstash.conf
+      - name: empty-dir
+        mountPath: /opt/bitnami/janusgraph/logs
+        subPath: app-logs-dir
+
 ## @param initContainers Add additional init containers to the JanusGraph pod(s)
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 ## e.g:
