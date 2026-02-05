@@ -219,10 +219,10 @@ The `kong-scripts` image is used for `kong-apis` and `kong-consumers` jobs. To b
 cd scripts/kong-api-scripts
 
 # Build for AMD64 architecture (recommended for Azure/AWS/GCP)
-docker buildx build --platform linux/amd64 -t <registryname>/kong-scripts:3.9.1 --push .
+docker buildx build --platform linux/amd64 -t <registry>/kong-scripts:3.9.1 --push .
 
 # Build for multiple architectures
-docker buildx build --platform linux/amd64,linux/arm64 -t <registryname>/kong-scripts:3.9.1 --push .
+docker buildx build --platform linux/amd64,linux/arm64 -t <registry>/kong-scripts:3.9.1 --push .
 ```
 
 **Important**: Always build for `linux/amd64` for production environments running on Azure, AWS, or GCP to avoid "exec format error" issues.
