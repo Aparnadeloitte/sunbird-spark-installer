@@ -7,6 +7,7 @@ metadata:
   annotations:
     {{- .Values.provisioningAnnotations | toYaml | nindent 4 }}
 spec:
+  ttlSecondsAfterFinished: 300
   template:
     spec:
       initContainers:
@@ -27,68 +28,49 @@ spec:
             - -c
           args:
             - |
-              echo "Starting Kong migrations with iterative up->finish strategy..."
+              set -e
+              echo "==== Starting Kong migrations ===="
               
-              # Step 1: Bootstrap (one-time, idempotent)
+              # Bootstrap database (idempotent)
               echo "Running bootstrap..."
-              if kong migrations bootstrap --v; then
-                echo "✓ Bootstrap completed"
-              else
-                echo "⚠ Bootstrap may have already run (this is normal)"
-              fi
+              kong migrations bootstrap --v
               
-              # Step 2: Iterative up->finish loop
+              # Iterative migration loop
               MAX_ITERATIONS=10
               for i in $(seq 1 $MAX_ITERATIONS); do
-                echo ""
-                echo "========================================="
-                echo "Migration Iteration $i/$MAX_ITERATIONS"
-                echo "========================================="
+                echo "==== Migration iteration $i/$MAX_ITERATIONS ===="
                 
-                # Run migrations up (adds new pending migrations)
-                echo "Running 'kong migrations up'..."
-                UP_OUTPUT=$(kong migrations up --v 2>&1 || true)
-                echo "$UP_OUTPUT"
+                # Run pending migrations
+                echo "Running migrations up..."
+                if ! kong migrations up --v 2>&1 | tee /tmp/up.log; then
+                  echo "⚠️  Migrations up had errors, checking if progress was made..."
+                fi
                 
                 # Wait for DB to settle
                 sleep 10
                 
-                # Run migrations finish (completes pending migrations)
-                echo "Running 'kong migrations finish'..."
-                FINISH_OUTPUT=$(kong migrations finish --v 2>&1 || true)
-                echo "$FINISH_OUTPUT"
-                
-                # Check if migrations are complete
-                if echo "$FINISH_OUTPUT" | grep -q "No pending migrations"; then
-                  echo ""
-                  echo "✓✓✓ All migrations completed successfully! ✓✓✓"
-                  kong migrations list 2>&1 || true
-                  exit 0
-                elif echo "$FINISH_OUTPUT" | grep -q "Database is already up-to-date"; then
-                  echo ""
-                  echo "✓✓✓ Database already up-to-date! ✓✓✓"
-                  kong migrations list 2>&1 || true
-                  exit 0
-                elif echo "$FINISH_OUTPUT" | grep -q "New migrations available"; then
-                  echo "⚠ More migrations available, continuing to next iteration..."
-                  sleep 10
-                  continue
+                # Finalize pending migrations
+                echo "Running migrations finish..."
+                if kong migrations finish --v 2>&1 | tee /tmp/finish.log; then
+                  # Check if all migrations are complete
+                  if grep -q "No pending migrations" /tmp/finish.log || grep -q "Database is already up-to-date" /tmp/finish.log; then
+                    echo "✅ All migrations completed successfully!"
+                    exit 0
+                  elif grep -q "New migrations available" /tmp/finish.log; then
+                    echo "ℹ️  New migrations available, continuing to next iteration..."
+                    sleep 10
+                    continue
+                  fi
                 else
-                  echo "⚠ Migrations incomplete, continuing to next iteration..."
-                  sleep 10
-                  continue
+                  echo "⚠️  Migrations finish had errors, will retry..."
+                  sleep 20
                 fi
               done
               
-              # If we exhausted all iterations, show status and fail
-              echo ""
               echo "❌ Migrations incomplete after $MAX_ITERATIONS iterations"
-              echo "Current migration status:"
-              kong migrations list 2>&1 || true
+              kong migrations list --v
               exit 1
           env:
-            - name: KONG_PG_MAX_CONCURRENT_QUERIES
-              value: "1"
             - name: KONG_PG_CONNECT_TIMEOUT
               value: "600"
             - name: KONG_PG_STATEMENT_TIMEOUT
@@ -97,6 +79,8 @@ spec:
               value: "120000"
             - name: KONG_PG_KEEPALIVE_TIMEOUT
               value: "600"
+            - name: KONG_PG_MAX_CONCURRENT_QUERIES
+              value: "1"
             - name: KONG_DATABASE
               value: {{ .Values.kong_database }}
             - name: KONG_PG_DATABASE
