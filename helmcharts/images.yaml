@@ -410,8 +410,3 @@ global:
     registry: "sunbirded.azurecr.io"
     repository: "data-pipeline"
     tag: "release-8.0.0_RC1_b4f909c"
-
-  obsrvflink:
-    registry: "sunbirded.azurecr.io"
-    repository: "sunbird-datapipeline"
-    tag: "release-5.2.0_RC8_9610bc7_13_be0895d"
