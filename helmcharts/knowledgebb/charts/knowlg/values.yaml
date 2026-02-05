@@ -181,7 +181,7 @@ inquiry:
   assessment_item_mime_type: "application/vnd.ekstep.ecml-archive"
   assessment_media_resolution: "low"
   # Janusgraph Configuration
-  graph_objecttypes_enabled: '["Question"]'
+  neo4j_objecttypes_enabled: '["Question"]'
 
 javaenv:
   javaoptions: -Xms500m -Xmx500m

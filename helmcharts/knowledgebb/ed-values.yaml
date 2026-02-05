@@ -5,6 +5,4 @@ kafka:
 redis:
   enabled: false
 yugabyte:
-  enabled: false  
-janusgraph:
   enabled: false
