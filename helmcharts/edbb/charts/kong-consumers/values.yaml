@@ -2,8 +2,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: sunbirded.azurecr.io/kong-scripts
-  tag: "0.1.8"
+  repository: divyagovindaiah123/kongapisworking
+  tag: "0.0.12"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -101,6 +101,7 @@ desktop_device_groups: &desktop_devicev_groups
   - deleteNotificationFeed
 
 anonymous_user_groups: &anonymous_user_groups
+  - portal_anonymous
   - deviceCreate
   - locationAccess
   - telemetryCreate

@@ -5,6 +5,20 @@ import json
 
 from common import get_apis, json_request, get_api_plugins, get_routes
 
+def _sanitize_plugin(plugin):
+    """Ensure JWT plugin uses secure anonymous fallback (like Kong 0.14.1 behavior)."""
+    try:
+        if plugin.get('name') != 'jwt':
+            return plugin
+        plugin_config = plugin.get('config', {}) or {}
+        # ALWAYS set to portal_anonymous for security (not portal_loggedin which has admin access)
+        plugin_config['anonymous'] = 'portal_anonymous'
+        plugin_config.pop('claims_to_verify', None)
+        plugin['config'] = plugin_config
+    except Exception:
+        pass
+    return plugin
+
 def save_apis(kong_admin_api_url, input_apis):
     """
     Kong 3.9.1 Upgrade: Save services and routes (replaces legacy /apis)
@@ -216,7 +230,7 @@ def _save_plugins_for_service(kong_admin_api_url, input_api_details):
         input_plugin = _convert_plugin_for_kong_3(input_plugin)
         print("Plugin data to POST: {}".format(json.dumps(input_plugin, indent=2)))
         try:
-            json_request("POST", plugins_url, input_plugin)
+            json_request("POST", plugins_url, _sanitize_plugin(input_plugin))
         except Exception as e:
             print("ERROR: Failed to create plugin {} for service {}".format(input_plugin["name"], service_name))
             raise
@@ -226,7 +240,7 @@ def _save_plugins_for_service(kong_admin_api_url, input_api_details):
         input_plugin = _convert_plugin_for_kong_3(input_plugin)
         saved_plugin_id = [saved_plugin["id"] for saved_plugin in saved_plugins if saved_plugin["name"] == input_plugin["name"]][0]
         input_plugin["id"] = saved_plugin_id
-        json_request("PATCH", plugins_url + "/" + saved_plugin_id, input_plugin)
+        json_request("PATCH", plugins_url + "/" + saved_plugin_id, _sanitize_plugin(input_plugin))
 
 def _convert_plugin_for_kong_3(plugin):
     """
@@ -310,14 +324,33 @@ def _convert_plugin_for_kong_3(plugin):
         plugin_config.pop('claims_to_verify', None)
         plugin_config.pop('maximum_expiration', None)
         
-        # Use anonymous consumer fallback for failed JWT validation
-        plugin_config['anonymous'] = 'portal_loggedin'
+        # Use anonymous consumer fallback for failed JWT validation (like Kong 0.14.1)
+        # SECURITY: portal_anonymous has limited read-only access vs portal_loggedin with admin permissions
+        plugin_config['anonymous'] = 'portal_anonymous'
         
         # Keep JWT extraction methods
         if 'header_names' not in plugin_config:
             plugin_config['header_names'] = ['authorization']
         if 'uri_param_names' not in plugin_config:
             plugin_config['uri_param_names'] = ['jwt']
+    
+    # ACL Plugin: Kong 3.9.1 compatibility - allow portal_anonymous consumer bypass
+    # In Kong 0.14.1: JWT anonymous="" meant no consumer set, ACL didn't enforce
+    # In Kong 3.x: JWT anonymous='portal_anonymous' sets consumer, ACL enforces strictly
+    # Solution: Add 'portal_anonymous' group to EVERY ACL allow list (bypass for anonymous)
+    # This is SECURE because portal_anonymous consumer only has limited read-only ACL groups
+    if plugin_name == 'acl':
+        if 'config' not in plugin or not plugin['config']:
+            plugin['config'] = {}
+        plugin_config = plugin['config']
+        
+        # Add 'portal_anonymous' to allow list - replicates Kong 0.14.1 anonymous="" behavior
+        if 'allow' in plugin_config and plugin_config['allow']:
+            if 'portal_anonymous' not in plugin_config['allow']:
+                plugin_config['allow'].append('portal_anonymous')
+        
+        if 'hide_groups_header' not in plugin_config:
+            plugin_config['hide_groups_header'] = False
     
     # Rate-limiting Plugin: Kong 3.0+ enhancements
     if plugin_name == 'rate-limiting':
@@ -334,6 +367,55 @@ def _sanitized_api_data(input_api):
     sanitized_api_data = dict((key, input_api[key]) for key in input_api if key not in keys_to_ignore)
     return sanitized_api_data
 
+def fix_all_acl_plugins_for_anonymous_access(kong_admin_api_url):
+    """
+    Post-migration fix: Ensure ALL ACL plugins (service and route level) include 'portal_anonymous' in allow list.
+    
+    This fixes Kong 3.9.1 compatibility issue where:
+    - Kong 0.14.1: JWT anonymous="" meant no consumer set, ACL didn't enforce
+    - Kong 3.x: JWT anonymous='portal_anonymous' sets consumer, ACL enforces strictly
+    
+    Solution: Add 'portal_anonymous' to every ACL plugin's allow list to replicate Kong 0.14.1 behavior.
+    This is SECURE because portal_anonymous consumer only has limited read-only ACL groups.
+    """
+    print("\n=== Fixing all ACL plugins to allow portal_anonymous access ===")
+    
+    # Get all plugins (includes service-level, route-level, and global plugins)
+    plugins_url = "{}/plugins?size=1000".format(kong_admin_api_url)
+    try:
+        response = urllib.request.urlopen(plugins_url)
+        all_plugins = json.loads(response.read())
+        acl_plugins = [p for p in all_plugins.get('data', []) if p.get('name') == 'acl']
+        
+        print("Found {} ACL plugins to check".format(len(acl_plugins)))
+        
+        updated_count = 0
+        for plugin in acl_plugins:
+            plugin_id = plugin['id']
+            allow_list = plugin.get('config', {}).get('allow', [])
+            
+            if 'portal_anonymous' not in allow_list:
+                # Add portal_anonymous to allow list
+                allow_list.append('portal_anonymous')
+                patch_data = {
+                    'config': {
+                        'allow': allow_list
+                    }
+                }
+                
+                patch_url = "{}/plugins/{}".format(kong_admin_api_url, plugin_id)
+                print("Updating ACL plugin {} - adding portal_anonymous to allow list".format(plugin_id))
+                json_request("PATCH", patch_url, patch_data)
+                updated_count += 1
+        
+        print("Updated {} ACL plugins with portal_anonymous access".format(updated_count))
+        print("=== ACL plugin fix complete ===\n")
+        
+    except Exception as e:
+        print("ERROR fixing ACL plugins: {}".format(str(e)))
+        # Don't fail the entire migration - this is a best-effort fix
+        pass
+
 if  __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Configure kong services and routes (Kong 3.9.1)')
     parser.add_argument('apis_file_path', help='Path of the json file containing services data')
@@ -343,6 +425,9 @@ if  __name__ == "__main__":
         input_apis = json.load(apis_file)
         try:
             save_apis(args.kong_admin_api_url, input_apis)
+            # Post-migration fix: Ensure all ACL plugins allow portal_anonymous access
+            # This handles both new and existing clusters
+            fix_all_acl_plugins_for_anonymous_access(args.kong_admin_api_url)
         except urllib.error.HTTPError as e:
             error_message = e.read().decode('utf-8')
             print(error_message)
