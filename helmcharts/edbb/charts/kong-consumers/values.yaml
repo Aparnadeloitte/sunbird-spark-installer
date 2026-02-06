@@ -2,9 +2,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: divyagovindaiah123/kongapisworking
-  tag: "0.0.12"
-  pullPolicy: IfNotPresent
+  repository: sunbirded.azurecr.io/kong-scripts
+  tag: "0.1.8"
+  pullPolicy: Always
   pullSecrets: []
 
 kong_admin_url: kong
