@@ -1,4 +1,4 @@
-deploy_dial_services:  &deploy_dial_services  "true"
+deploy_dial_services:  &deploy_dial_services  "false"
 enable_asset_enrichment: &enable_asset_enrichment "false"
 default_passwords:
   grafana_admin_password: &grafana-admin-password "prom-operator"
