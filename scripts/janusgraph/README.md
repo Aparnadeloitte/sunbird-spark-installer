@@ -14,16 +14,13 @@ bin/cypher-shell -u neo4j \
 
 ## 2. Prepare JanusGraph (Run in Kubernetes environment)
 
-1. Get the JanusGraph pod name dynamically and set `JG_POD`:
-```bash
-JG_POD=$(kubectl get pods -n sunbird -l app=janusgraph -o jsonpath="{.items[0].metadata.name}")
-```
-
-2. Run schema initialization (this creates vertex/edge labels, properties, and indexes):
-```bash
-kubectl cp schema_init.groovy sunbird/$JG_POD:/tmp/schema_init.groovy
-kubectl exec -it -n sunbird $JG_POD -- /opt/bitnami/janusgraph/bin/gremlin.sh -e /tmp/schema_init.groovy
-```
+> **Note:** Schema initialization is now handled automatically by the Helm deployment job (`schemaInit.enabled: true` in values.yaml). Skip to step 3 after confirming the schema-init job has completed successfully.
+>
+> Check schema-init job status:
+> ```bash
+> kubectl get jobs -n sunbird | grep schema-init
+> kubectl logs -n sunbird -l app=janusgraph,job=schema-init --tail=50
+> ```
 
 ## 3. Copy Neo4j CSV data and migration scripts to the JanusGraph pod
 After schema initialization completes, copy the CSV files and import/verify scripts:

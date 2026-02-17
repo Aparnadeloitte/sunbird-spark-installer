@@ -1030,3 +1030,21 @@ cassandra:
   service:
     ports:
       cql: 9043
+
+## @section Schema Initialization
+##
+## Schema initialization job configuration
+##
+schemaInit:
+  ## @param schemaInit.enabled Enable schema initialization job
+  ##
+  enabled: true
+  ## @param schemaInit.resources Resources for schema initialization job
+  ##
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 250m
+      memory: 100Mi

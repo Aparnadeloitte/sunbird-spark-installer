@@ -16,6 +16,8 @@ data:
 {{ tpl (.Files.Get "config/logstash.conf") . | indent 4 }}
   empty-sample.groovy: |
 {{ .Files.Get "config/empty-sample.groovy" | indent 4 }}
+  schema-init.groovy: |
+{{ .Files.Get "config/schema_init.groovy" | indent 4 }}
   janusgraph-cql.properties: |
 {{ .Files.Get "config/janusgraph-cql.properties" | indent 4 }}
   cdc-log4j.properties: |
