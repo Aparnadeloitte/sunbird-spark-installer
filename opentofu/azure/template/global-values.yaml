@@ -61,6 +61,7 @@ global:
   yugabyte:
     ysql:
       user: "yugabyte"  
+      password: "yugabyte"
   keycloak:
    keycloak_user: admin
    keycloak_password: *keycloak-password  
