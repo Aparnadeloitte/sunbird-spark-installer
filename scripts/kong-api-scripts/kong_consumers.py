@@ -3,7 +3,6 @@ import urllib.error
 import argparse
 import json
 import jwt
-import time
 
 from common import json_request, get_api_plugins, retrying_urlopen
 
@@ -156,18 +155,7 @@ def _save_rate_limits(kong_admin_api_url, saved_consumer, rate_limits, stats):
                 
                 if changed:
                     print("Updating rate_limit for consumer {} for service {}".format(consumer_username, service_name))
-                    # Kong PATCH only accepts mutable fields: config and enabled
-                    # All other fields (id, name, created_at, updated_at, service_id, etc.) are read-only
-                    plugin_data_for_patch = {}
-                    if 'config' in rate_limit_plugin_data:
-                        plugin_data_for_patch['config'] = rate_limit_plugin_data['config']
-                    if 'enabled' in rate_limit_plugin_data:
-                        plugin_data_for_patch['enabled'] = rate_limit_plugin_data['enabled']
-                    # Also include any other rate-limit-specific fields that might be mutable
-                    for key in ['ratelimit_config']:
-                        if key in rate_limit_plugin_data:
-                            plugin_data_for_patch[key] = rate_limit_plugin_data[key]
-                    json_request("PATCH", plugins_url + "/" + rate_limit_plugin_for_this_consumer["id"], plugin_data_for_patch)
+                    json_request("PATCH", plugins_url + "/" + rate_limit_plugin_for_this_consumer["id"], rate_limit_plugin_data)
                     stats["rate_limits"]["updated"] += 1
                 else:
                     stats["rate_limits"]["skipped"] += 1
@@ -252,43 +240,17 @@ def _get_first_or_create_jwt_credential(kong_admin_api_url, consumer, stats):
             return jwt_credential
         except urllib.error.HTTPError as e:
             if e.code == 409:
-                # Credential already exists, fetch and return it
-                print(f"  ⚠ Credential already exists for {username}, fetching existing credential")
-                # Add a small delay before fetching to allow Kong to complete transaction
-                time.sleep(2)
-                try:
-                    saved_credentials_details = json.loads(retrying_urlopen(consumer_jwt_credentials_url).read().decode('utf-8'))
-                    saved_credentials = saved_credentials_details["data"]
-                    # Find credential by key
-                    for cred in saved_credentials:
-                        if cred.get('key') == credential_data.get('key'):
-                            return cred
-                    # If not found by key, return first one with matching algorithm
-                    for cred in saved_credentials:
-                        if cred.get('algorithm') == credential_algorithm:
-                            return cred
-                    # Fallback: return first credential
-                    if saved_credentials:
-                        return saved_credentials[0]
-                    # If no credentials found, construct and return a default one from our data
-                    print(f"  ⚠ No existing credentials found, creating default response from submitted data")
-                    return {
-                        "key": credential_data.get('key', username),
-                        "algorithm": credential_algorithm,
-                        "iss": credential_iss,
-                        "secret": credential_data.get('secret', ''),
-                        "rsa_public_key": credential_data.get('rsa_public_key', '')
-                    }
-                except Exception as fetch_error:
-                    print(f"  ✗ Failed to fetch existing credentials after 409: {fetch_error}")
-                    # Even if fetch fails, return a response based on what we tried to create
-                    return {
-                        "key": credential_data.get('key', username),
-                        "algorithm": credential_algorithm,
-                        "iss": credential_iss,
-                        "secret": credential_data.get('secret', ''),
-                        "rsa_public_key": credential_data.get('rsa_public_key', '')
-                    }
+                print(f"  ⚠ Credential key {credential_key} already exists, fetching existing one")
+                saved_credentials_details = json.loads(retrying_urlopen(consumer_jwt_credentials_url).read().decode('utf-8'))
+                shared_credentials = saved_credentials_details["data"]
+                
+                for cred in shared_credentials:
+                    if cred.get('key') == credential_key:
+                        stats["credentials"]["skipped"] += 1
+                        if cred['algorithm'] == 'HS256':
+                            jwt_token = jwt.encode({'iss': cred['key']}, cred['secret'], algorithm='HS256')
+                            print("JWT token for {} is : {}".format(username, jwt_token))
+                        return cred
             raise
 
 def _save_groups_for_consumer(kong_admin_api_url, consumer, owned_groups, stats, managed_by="core"):
