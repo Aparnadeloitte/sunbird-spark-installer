@@ -427,7 +427,14 @@ def _convert_plugin_for_kong_3(plugin_input):
                 pass
 
     # Plugin-specific schema cleanup and transformations
-    if plugin_name == 'acl':
+    if plugin_name == 'cors':
+        # CORS plugin - clean up any contaminated fields from previous plugins
+        # Kong 3.9.1 CORS plugin schema - only these fields are valid
+        valid_keys = ['origins', 'methods', 'headers', 'exposed_headers',
+                     'max_age', 'preflight_continue', 'credentials', 'credentials_header']
+        plugin_config = {k: v for k, v in plugin_config.items() if k in valid_keys or k.startswith('_')}
+
+    elif plugin_name == 'acl':
         if 'whitelist' in plugin_config:
             plugin_config['allow'] = plugin_config.pop('whitelist')
         if 'blacklist' in plugin_config:
@@ -482,6 +489,12 @@ def _convert_plugin_for_kong_3(plugin_input):
                 for field in ['headers', 'querystring', 'body']:
                     if field in plugin_config[action] and isinstance(plugin_config[action][field], str):
                         plugin_config[action][field] = [plugin_config[action][field]]
+
+    else:
+        # For any other plugins without specific handlers, only keep non-internal fields
+        # This prevents contamination from dotted key processing
+        # Most plugins only need 'config' and 'enabled' fields for PATCH anyway
+        pass
 
     plugin['config'] = plugin_config
     return plugin
