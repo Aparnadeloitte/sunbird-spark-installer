@@ -59,7 +59,7 @@ images:
 
   player: &player
     repository: "sunbirded.azurecr.io/sunbird-portal"
-    tag: "spark-v0.54_9fd166b"
+    tag: "spark-v0.57_d99a74f"
 
   router: &router
     repository: "sunbirded.azurecr.io/router"
@@ -72,11 +72,11 @@ images:
 
   kong_apis: &kong_apis
     repository: "ghcr.io/sunbird-spark/kong-api-scripts"
-    tag: "develop_499032f"
+    tag: "develop_a25c8c5"
 
   kong_consumers: &kong_consumers
     repository: "ghcr.io/sunbird-spark/kong-api-scripts"
-    tag: "develop_499032f"
+    tag: "develop_a25c8c5"
 
   knowledge_mw: &knowledge_mw
     repository: "ghcr.io/sunbird-knowlg/knowledge-mw-service"
