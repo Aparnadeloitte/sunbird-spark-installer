@@ -72,11 +72,11 @@ images:
 
   kong_apis: &kong_apis
     repository: "ghcr.io/sunbird-spark/kong-api-scripts"
-    tag: "develop_3ab2c27"
+    tag: "develop_5d204eb"
 
   kong_consumers: &kong_consumers
     repository: "ghcr.io/sunbird-spark/kong-api-scripts"
-    tag: "develop_3ab2c27"
+    tag: "develop_5d204eb"
 
   knowledge_mw: &knowledge_mw
     repository: "ghcr.io/sunbird-knowlg/knowledge-mw-service"
@@ -159,7 +159,7 @@ images:
     registry: ghcr.io
     repository: sunbird-spark/janusgraph
     tag: develop_cb093d4
-    
+
   yugabytecql: &yugabytecql
     repository: "ghcr.io/sunbird-spark/sunbird-yugabyte-migrations"
     tag: "develop_8425122"
@@ -316,7 +316,6 @@ internal: &internal
     image: *search
     imagePullSecrets:
       - name: "registry-secret-name"
-
 
   telemetry:
     image: *telemetry
