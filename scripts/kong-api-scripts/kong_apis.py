@@ -57,17 +57,8 @@ def save_apis(kong_admin_api_url, input_apis, managed_by=None):
     # Helper to check if service changed
     def _is_service_different(new_data, saved_service):
         for key in ["url", "retries", "connect_timeout", "write_timeout", "read_timeout"]:
-            if key in new_data:
-                nv = new_data[key]
-                ov = saved_service.get(key)
-                
-                # Normalize URL for comparison (ignore trailing slashes)
-                if key == "url" and isinstance(nv, str) and isinstance(ov, str):
-                    nv = nv.rstrip("/")
-                    ov = ov.rstrip("/")
-                
-                if nv != ov:
-                    return True
+            if key in new_data and new_data[key] != saved_service.get(key):
+                return True
         # Check tags (adoption)
         new_tags = new_data.get("tags", [])
         saved_tags = saved_service.get("tags") or []
@@ -90,12 +81,8 @@ def save_apis(kong_admin_api_url, input_apis, managed_by=None):
         
         if _is_service_different(service_data, saved_service):
             print("Updating service {}".format(input_service["name"]))
-            # Prepare clean PATCH payload
-            patch_payload = copy.deepcopy(service_data)
-            patch_payload.pop("id", None)
-            patch_payload.pop("name", None)
             try:
-                json_request("PATCH", services_url + "/" + saved_service["id"], patch_payload)
+                json_request("PATCH", services_url + "/" + saved_service["id"], service_data)
                 stats["services"]["updated"] += 1
             except Exception as e:
                 print("  ✗ Error updating service {}: {}".format(input_service["name"], str(e)))
@@ -256,13 +243,8 @@ def _save_routes_for_service(kong_admin_api_url, input_api_details, stats):
         if existing_route:
             if _is_route_different(route_data, existing_route):
                 print("  ✓ Updating route {} for service {}".format(route_data["name"], service_name))
-                # Prepare clean PATCH payload
-                patch_payload = copy.deepcopy(route_data)
-                patch_payload.pop("id", None)
-                patch_payload.pop("name", None)
-                patch_payload.pop("service", None)
                 try:
-                    json_request("PATCH", routes_url + "/" + existing_route["id"], patch_payload)
+                    json_request("PATCH", routes_url + "/" + existing_route["id"], route_data)
                     stats["routes"]["updated"] += 1
                 except Exception as e:
                     print("  ✗ Error updating route: {}".format(str(e)))
@@ -283,11 +265,7 @@ def _save_routes_for_service(kong_admin_api_url, input_api_details, stats):
                         existing_route = next((r for r in all_routes_response.get("data", []) if r.get("name") == route_data["name"]), None)
                         if existing_route:
                             print("  ✓ Updating existing route {} for service {}".format(route_data["name"], service_name))
-                            patch_payload = copy.deepcopy(route_data)
-                            patch_payload.pop("id", None)
-                            patch_payload.pop("name", None)
-                            patch_payload.pop("service", None)
-                            json_request("PATCH", routes_url + "/" + existing_route["id"], patch_payload)
+                            json_request("PATCH", routes_url + "/" + existing_route["id"], route_data)
                             stats["routes"]["updated"] += 1
                         else:
                             print("  ✗ Route exists but could not find it: {}".format(route_data["name"]))
@@ -322,7 +300,7 @@ def _save_plugins_for_service(kong_admin_api_url, input_api_details, stats):
     plugins_url = "{}/services/{}/plugins".format(kong_admin_api_url, service_name)
     
     saved_plugins_including_consumer_overrides = get_api_plugins(kong_admin_api_url, service_name)
-    saved_plugins_without_consumer_overrides = [plugin for plugin in saved_plugins_including_consumer_overrides if not plugin.get('consumer_id') and not plugin.get('consumer')]
+    saved_plugins_without_consumer_overrides = [plugin for plugin in saved_plugins_including_consumer_overrides if not plugin.get('consumer_id')]
 
     saved_plugins = saved_plugins_without_consumer_overrides
     input_plugin_names = [input_plugin["name"] for input_plugin in input_plugins]
@@ -337,20 +315,12 @@ def _save_plugins_for_service(kong_admin_api_url, input_api_details, stats):
         # Simple recursive compare for dicts
         def dict_compare(d1, d2):
             if not isinstance(d1, dict) or not isinstance(d2, dict):
-                # Handle lists (e.g. statsd metrics, acl allow lists)
+                # Handle lists
                 if isinstance(d1, list) and isinstance(d2, list):
-                    if len(d1) != len(d2):
-                        return True
-                    # Deep compare lists of dicts by converting to canonical JSON strings
-                    def canonical(v):
-                        return json.dumps(v, sort_keys=True) if isinstance(v, (dict, list)) else str(v)
-                    return sorted([canonical(v) for v in d1]) != sorted([canonical(v) for v in d2])
+                    return sorted([str(v) for v in d1]) != sorted([str(v) for v in d2])
                 return d1 != d2
-            
-            # Kong 3.x Upgrade: Only compare keys present in our input (d1)
-            # This prevents 'redundant' updates caused by Kong adding default fields
-            for k in d1.keys():
-                if k not in d2:
+            for k in set(d1.keys()).union(d2.keys()):
+                if k not in d1 or k not in d2:
                     return True
                 if dict_compare(d1[k], d2[k]):
                     return True
@@ -392,14 +362,9 @@ def _save_plugins_for_service(kong_admin_api_url, input_api_details, stats):
         
         if _is_plugin_different(sanitized_plugin, saved_plugin):
             print("Updating plugin {} for service {}".format(input_plugin["name"], service_name));
-            # Prepare clean PATCH payload: Remove identity and association fields
-            # that can cause HTTP 500 errors in Kong 3.x during validation.
-            patch_payload = copy.deepcopy(sanitized_plugin)
-            for key in ['id', 'name', 'service', 'route', 'consumer', 'created_at', 'tags']:
-                patch_payload.pop(key, None)
-
+            sanitized_plugin["id"] = saved_plugin["id"]
             try:
-                json_request("PATCH", plugins_url + "/" + saved_plugin["id"], patch_payload)
+                json_request("PATCH", plugins_url + "/" + saved_plugin["id"], sanitized_plugin)
                 stats["plugins"]["updated"] += 1
             except Exception as e:
                 print("  ✗ Error updating plugin {} for service {}: {}".format(input_plugin["name"], service_name, str(e)))
