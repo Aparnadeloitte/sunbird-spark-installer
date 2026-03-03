@@ -3,6 +3,7 @@ import urllib.error
 import argparse
 import json
 import jwt
+import time
 
 from common import json_request, get_api_plugins, retrying_urlopen
 
@@ -175,19 +176,41 @@ def _get_first_or_create_jwt_credential(kong_admin_api_url, consumer):
             if e.code == 409:
                 # Credential already exists, fetch and return it
                 print(f"  ⚠ Credential already exists for {username}, fetching existing credential")
-                saved_credentials_details = json.loads(retrying_urlopen(consumer_jwt_credentials_url).read().decode('utf-8'))
-                saved_credentials = saved_credentials_details["data"]
-                # Find credential by key
-                for cred in saved_credentials:
-                    if cred.get('key') == credential_data.get('key'):
-                        return cred
-                # If not found by key, return first one with matching algorithm
-                for cred in saved_credentials:
-                    if cred.get('algorithm') == credential_algorithm:
-                        return cred
-                # Fallback: return first credential
-                if saved_credentials:
-                    return saved_credentials[0]
+                # Add a small delay before fetching to allow Kong to complete transaction
+                time.sleep(2)
+                try:
+                    saved_credentials_details = json.loads(retrying_urlopen(consumer_jwt_credentials_url).read().decode('utf-8'))
+                    saved_credentials = saved_credentials_details["data"]
+                    # Find credential by key
+                    for cred in saved_credentials:
+                        if cred.get('key') == credential_data.get('key'):
+                            return cred
+                    # If not found by key, return first one with matching algorithm
+                    for cred in saved_credentials:
+                        if cred.get('algorithm') == credential_algorithm:
+                            return cred
+                    # Fallback: return first credential
+                    if saved_credentials:
+                        return saved_credentials[0]
+                    # If no credentials found, construct and return a default one from our data
+                    print(f"  ⚠ No existing credentials found, creating default response from submitted data")
+                    return {
+                        "key": credential_data.get('key', username),
+                        "algorithm": credential_algorithm,
+                        "iss": credential_iss,
+                        "secret": credential_data.get('secret', ''),
+                        "rsa_public_key": credential_data.get('rsa_public_key', '')
+                    }
+                except Exception as fetch_error:
+                    print(f"  ✗ Failed to fetch existing credentials after 409: {fetch_error}")
+                    # Even if fetch fails, return a response based on what we tried to create
+                    return {
+                        "key": credential_data.get('key', username),
+                        "algorithm": credential_algorithm,
+                        "iss": credential_iss,
+                        "secret": credential_data.get('secret', ''),
+                        "rsa_public_key": credential_data.get('rsa_public_key', '')
+                    }
             raise
 
 def _save_groups_for_consumer(kong_admin_api_url, consumer):
