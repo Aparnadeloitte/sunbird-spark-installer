@@ -105,6 +105,7 @@ The Docker image is built using a **multi-stage build** process. This eliminates
 To build the image locally, simply run:
 ```bash
 docker build -t janusgraph-cdc-custom:1.1.0 .
+
 ```
 
 #### GitHub Automation
