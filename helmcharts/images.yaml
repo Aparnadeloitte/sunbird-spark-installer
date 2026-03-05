@@ -54,7 +54,7 @@ images:
 
   player: &player
     repository: "sunbirded.azurecr.io/sunbird-portal"
-    tag: "spark-v0.57_d99a74f"
+    tag: "spark-v0.67_0ab2add"
 
   router: &router
     repository: "sunbirded.azurecr.io/router"
@@ -107,7 +107,7 @@ images:
 
   keycloak: &keycloak
     repository: "ghcr.io/sunbird-spark/keycloak-21.1.2"
-    tag: "develop_c41d3c8"
+    tag: "develop_4ea9920"
 
   keycloak-kids-keys: &keycloak-kids-keys
     repository: "ghcr.io/sunbird-spark/keycloak-postgres-query"
@@ -153,7 +153,7 @@ images:
   janusgraph: &janusgraph
     registry: ghcr.io
     repository: sunbird-spark/janusgraph
-    tag: develop_cb093d4
+    tag: develop_b96ef55
 
   yugabytecql: &yugabytecql
     repository: "ghcr.io/sunbird-spark/sunbird-yugabyte-migrations"
