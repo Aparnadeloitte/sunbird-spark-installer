@@ -33,7 +33,7 @@ flink: &flink
       memory: 1024Mi
     limits:
       cpu: 1
-      memory: 3072Mi  
+      memory: 3Gi  
   
 knowledgebb:
   flink: *flink
@@ -181,14 +181,6 @@ elasticsearch:
     persistence:
       size: 25Gi   
 
-flink: &flink
-  resources:
-    requests:
-      cpu: 100m
-      memory: 1024Mi
-    limits:
-      cpu: 1
-      memory: 2048Mi   
 
 kafka:
   broker:
@@ -240,8 +232,6 @@ knowlg:
       cpu: 1
       memory: 1024Mi 
 
-knowledgebb:
-  flink: *flink
 
 kong:
   resources:
