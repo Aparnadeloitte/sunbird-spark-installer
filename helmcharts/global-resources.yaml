@@ -33,7 +33,7 @@ flink: &flink
       memory: 1024Mi
     limits:
       cpu: 1
-      memory: 2048Mi  
+      memory: 3072Mi  
   
 knowledgebb:
   flink: *flink
