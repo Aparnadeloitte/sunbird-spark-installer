@@ -608,7 +608,7 @@ flink_jobs:
 
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
-      taskmanager.memory.flink.size: 1024m
+      taskmanager.memory.flink.size: 2048m
       taskmanager.numberOfTaskSlots: 1
       jobManager.numberOfTaskSlots: 1
       parallelism.default: 1
@@ -618,7 +618,7 @@ flink_jobs:
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       taskmanager.memory.process.size: 1700m
-      jobmanager.memory.process.size: 1600m
+      jobmanager.memory.process.size: 2800m
       # classloader.resolve-order: "parent-first"
       # state.savepoints.dir: file:///tmp
     job_classname: org.sunbird.job.knowlg.task.KnowlgPublishStreamTask
