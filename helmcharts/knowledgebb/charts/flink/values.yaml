@@ -617,8 +617,8 @@ flink_jobs:
       scheduler-mode: reactive
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
-      taskmanager.memory.process.size: 1700m
-      jobmanager.memory.process.size: 2800m
+      taskmanager.memory.process.size: 2800m
+      jobmanager.memory.process.size: 1600m
       # classloader.resolve-order: "parent-first"
       # state.savepoints.dir: file:///tmp
     job_classname: org.sunbird.job.knowlg.task.KnowlgPublishStreamTask
