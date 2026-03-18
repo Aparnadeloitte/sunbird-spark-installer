@@ -451,7 +451,6 @@ flink_jobs:
         keyspace = "sunbird_dialcodes"
         imageTable = "dialcode_images"
       }
-      
       service {
         dial.basePath = "{{ .Values.global.dialservice.base_url }}"
         dial_code.reserve.url = "/dialcode/v1/reserve"
