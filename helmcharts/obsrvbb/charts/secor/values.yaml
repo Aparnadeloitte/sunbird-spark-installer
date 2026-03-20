@@ -49,6 +49,9 @@ base_config: &base_config
   requests:
     cpu: 500m
     memory: 500Mi
+  limits:
+    cpu: 500m
+    memory: 500Mi
   lag_threshold_warning: 50000
   lag_threshold_critical: 100000
 
