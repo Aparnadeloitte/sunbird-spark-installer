@@ -351,8 +351,8 @@ internal: &internal
 global:
   knowledgeflink:
     registry: "ghcr.io"
-    repository: "sunbird-knowlg/knowledge-platform-jobs"
-    tag: "spark-v12_569f0fe"
+    repository: "aimansharief/knowledge-platform-jobs"
+    tag: "spark-op-1_a32f981"
 
   learnflink:
     registry: "ghcr.io/sunbird-lern"
