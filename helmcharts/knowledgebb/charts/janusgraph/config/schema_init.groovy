@@ -139,7 +139,38 @@ makeCompositeIndex('byNodeType', 'IL_SYS_NODE_TYPE', false)
 println "Committing Transaction..."
 mgmt.commit()
 
-// 7. Wait for all indexes to reach REGISTERED (or ENABLED if already there)
+// 7. Explicitly register any indexes still at INSTALLED
+println "Registering INSTALLED indexes..."
+mgmtR = jg.openManagement()
+registerFailed = false
+allIndexNames.each { indexName ->
+    try {
+        def idx = mgmtR.getGraphIndex(indexName)
+        if (idx) {
+            def status = idx.getIndexStatus(idx.getFieldKeys()[0])
+            if (status == SchemaStatus.INSTALLED) {
+                println "Registering index: $indexName (currently INSTALLED)"
+                mgmtR.updateIndex(idx, SchemaAction.REGISTER_INDEX).get()
+            } else {
+                println "Index $indexName is already $status — skipping register."
+            }
+        } else {
+            println "ERROR: Index $indexName not found during registration."
+            registerFailed = true
+        }
+    } catch (Exception e) {
+        println "ERROR: Could not register index $indexName: ${e.message}"
+        registerFailed = true
+    }
+}
+if (registerFailed) {
+    mgmtR.rollback()
+    throw new RuntimeException("One or more indexes failed to register — rolled back. Check errors above.")
+}
+mgmtR.commit()
+println "Registration committed."
+
+// 9. Wait for all indexes to reach REGISTERED (or ENABLED if already there)
 println "Waiting for all indexes to reach REGISTERED status..."
 allIndexNames.each { indexName ->
     try {
@@ -161,7 +192,7 @@ allIndexNames.each { indexName ->
     }
 }
 
-// 8. Enable all indexes that are still in REGISTERED state
+// 10. Enable all indexes that are still in REGISTERED state
 println "Enabling all REGISTERED indexes..."
 mgmt2 = jg.openManagement()
 enableFailed = false
@@ -192,7 +223,7 @@ if (enableFailed) {
 mgmt2.commit()
 println "Enable actions committed."
 
-// 9. Wait for all indexes to reach ENABLED
+// 11. Wait for all indexes to reach ENABLED
 println "Waiting for all indexes to reach ENABLED status..."
 enabledFailed = false
 allIndexNames.each { indexName ->
@@ -215,7 +246,7 @@ allIndexNames.each { indexName ->
     }
 }
 
-// 10. Final status report
+// 12. Final status report
 println "--- FINAL INDEX STATUS REPORT ---"
 mgmt3 = jg.openManagement()
 try {
