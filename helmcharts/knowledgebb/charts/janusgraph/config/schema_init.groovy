@@ -217,7 +217,7 @@ allIndexNames.each { indexName ->
             .status(SchemaStatus.REGISTERED, SchemaStatus.ENABLED)
             .timeout(5L, ChronoUnit.MINUTES)
             .call()
-        if (report.isSucceeded()) {
+        if (report.getSucceeded()) {
             println "Index $indexName reached REGISTERED or ENABLED."
         } else {
             throw new RuntimeException("Index $indexName did not reach REGISTERED within timeout: ${report}")
@@ -271,7 +271,7 @@ allIndexNames.each { indexName ->
             .status(SchemaStatus.ENABLED)
             .timeout(5L, ChronoUnit.MINUTES)
             .call()
-        if (report.isSucceeded()) {
+        if (report.getSucceeded()) {
             println "Index $indexName is ENABLED."
         } else {
             println "ERROR: Index $indexName did not reach ENABLED within timeout: ${report}"
