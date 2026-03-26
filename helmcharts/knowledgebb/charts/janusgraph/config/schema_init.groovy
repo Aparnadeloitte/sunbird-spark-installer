@@ -11,19 +11,46 @@ import org.janusgraph.core.Multiplicity
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import java.time.temporal.ChronoUnit
 
-// 1. Connect to graph
+// 1. Connect to graph.
 // When loaded via ScriptFileGremlinPlugin at server startup, 'graph' is already
 // bound by the gremlin server — use it directly (single instance, no coordination delay).
 // When run via gremlin.sh -e in the schema-init Job, 'graph' is not bound —
-// fall back to opening a direct connection (all indexes already ENABLED at this
-// point so no inter-instance coordination is needed).
+// fall back to a direct connection for post-deploy verification.
+isServerContext = false
 try {
     jg = graph
-    println "Using gremlin server's graph instance."
+    isServerContext = true
+    println "Running in gremlin server context (ScriptFileGremlinPlugin)."
 } catch (MissingPropertyException e) {
     jg = org.janusgraph.core.JanusGraphFactory.open('/opt/bitnami/janusgraph/conf/janusgraph.properties')
-    println "Using direct JanusGraphFactory connection (schema-init Job context)."
+    println "Running in schema-init Job context (verification only)."
 }
+
+// 2. Force-close stale JanusGraph instances left by previous failed runs.
+// ONLY safe to run from server context — in Job context the live gremlin server
+// instance would appear as "non-current" and get incorrectly force-closed.
+if (isServerContext) {
+    println "Checking for stale JanusGraph instances..."
+    mgmtClean = jg.openManagement()
+    try {
+        def openInstances = mgmtClean.getOpenInstances()
+        println "Registered instances: ${openInstances}"
+        openInstances.each { instance ->
+            if (!instance.endsWith("(current)")) {
+                println "Force-closing stale instance: $instance"
+                mgmtClean.forceCloseInstance(instance)
+            }
+        }
+        mgmtClean.commit()
+        println "Stale instance cleanup complete."
+    } catch (Exception e) {
+        mgmtClean.rollback()
+        println "Warning: stale instance cleanup failed (non-fatal): ${e.message}"
+    }
+} else {
+    println "Skipping stale instance cleanup (Job context — server instance must not be disturbed)."
+}
+
 mgmt = jg.openManagement()
 
 println "--- STARTING SCHEMA INITIALIZATION ---"
