@@ -55,7 +55,7 @@ mgmt = jg.openManagement()
 
 println "--- STARTING SCHEMA INITIALIZATION ---"
 
-// 2. Define Property Keys
+// 3. Define Property Keys
 // Helper closure to create property if missing
 makeProperty = { key, dataType, cardinality ->
     if (!mgmt.containsPropertyKey(key)) {
@@ -67,7 +67,7 @@ makeProperty = { key, dataType, cardinality ->
 makeProperty('IL_UNIQUE_ID', String.class, Cardinality.SINGLE)
 makeProperty('IL_FUNC_OBJECT_TYPE', String.class, Cardinality.SINGLE) // ObjectType
 makeProperty('IL_SYS_NODE_TYPE', String.class, Cardinality.SINGLE)    // NodeType
-makeProperty('IL_TAG_NAME', String.class, Cardinality.SINGLE) 
+makeProperty('IL_TAG_NAME', String.class, Cardinality.SINGLE)
 
 makeProperty('identifier', String.class, Cardinality.SINGLE)
 makeProperty('code', String.class, Cardinality.SINGLE)
@@ -98,10 +98,8 @@ makeProperty('compatibilityLevel', Integer.class, Cardinality.SINGLE)
 makeProperty('osId', String.class, Cardinality.SINGLE)
 makeProperty('language', String.class, Cardinality.LIST)
 
-// ... (Add other common properties as needed)
 
-
-// 3. Define Vertex Labels
+// 4. Define Vertex Labels
 makeVLabel = { name ->
     if (!mgmt.containsVertexLabel(name)) {
         println "Creating VertexLabel: $name"
@@ -123,7 +121,7 @@ makeVLabel('Asset')
 makeVLabel('Domain')
 makeVLabel('Dimension')
 
-// 4. Define Edge Labels
+// 5. Define Edge Labels
 makeELabel = { name, multiplicity ->
     if (!mgmt.containsEdgeLabel(name)) {
         println "Creating EdgeLabel: $name"
@@ -134,7 +132,7 @@ makeELabel = { name, multiplicity ->
 makeELabel('hasSequenceMember', Multiplicity.MULTI)
 makeELabel('associatedTo', Multiplicity.MULTI)
 
-// 5. Define Indexes (CRITICAL: Index-First Strategy)
+// 6. Define Indexes (CRITICAL: Index-First Strategy)
 // allIndexNames is the single source of truth — used both for creation and for
 // the enable/await phases below. Add new indexes here and nowhere else.
 allIndexNames = []
@@ -158,10 +156,10 @@ makeCompositeIndex = { name, keyName, unique ->
     }
 }
 
-// 5a. Unique Indexes
+// 6a. Unique Indexes
 makeCompositeIndex('byUniqueId', 'IL_UNIQUE_ID', true)
 
-// 5b. Non-Unique Indexes
+// 6b. Non-Unique Indexes
 makeCompositeIndex('byCode', 'code', false)
 makeCompositeIndex('byIdentifier', 'identifier', false)
 makeCompositeIndex('byChannel', 'channel', false)
@@ -169,14 +167,14 @@ makeCompositeIndex('byFramework', 'framework', false)
 makeCompositeIndex('byMimeType', 'mimeType', false)
 makeCompositeIndex('byContentType', 'contentType', false)
 makeCompositeIndex('byVisibility', 'visibility', false)
-makeCompositeIndex('byObjectTypeAndStatus', 'IL_FUNC_OBJECT_TYPE', false) // Note: Simplified to single key for base
+makeCompositeIndex('byObjectTypeAndStatus', 'IL_FUNC_OBJECT_TYPE', false)
 makeCompositeIndex('byNodeType', 'IL_SYS_NODE_TYPE', false)
 
-// 6. Commit Changes
+// 7. Commit Changes
 println "Committing Transaction..."
 mgmt.commit()
 
-// 7. Explicitly register any indexes still at INSTALLED
+// 8. Explicitly register any indexes still at INSTALLED
 println "Registering INSTALLED indexes..."
 mgmtR = jg.openManagement()
 registerFailed = false
