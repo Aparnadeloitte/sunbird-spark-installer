@@ -491,10 +491,10 @@ yugabyte:
   resource:
     master:
       requests:
-        cpu: "2"
+        cpu: "1"
         memory: 2Gi
       limits:
-        cpu: "2"
+        cpu: "1"
         memory: 2Gi
     tserver:
       requests:
