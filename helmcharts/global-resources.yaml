@@ -187,10 +187,10 @@ kafka:
     replicaCount: 3
     resources:
       limits:
-        cpu: 1
+        cpu: 750m
         memory: 2048Mi
       requests:
-        cpu: 750m
+        cpu: 500m
         memory: 1024Mi
     persistence:
       size: 8Gi
