@@ -6,7 +6,7 @@ channel: &channel
   default: "in.ekstep"
 
 knowlg:
-  opa_enabled: true
+  opa_enabled: false
 
 provisioningAnnotations: &provisioningAnnotations
   "helm.sh/hook-weight": "-4"
