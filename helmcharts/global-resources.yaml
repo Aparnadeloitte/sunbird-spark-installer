@@ -96,7 +96,7 @@ player:
       memory: 1G
  
 #knowledgebb
-kafkagraph:
+janusgraph:
   resources:
     requests:
       cpu: 1
