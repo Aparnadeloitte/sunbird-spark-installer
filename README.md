@@ -4,27 +4,24 @@ Minimum resources required to install and run Sunbird-ED on any cloud provider
 
 ## Infrastructure Overview
 
-**Node:** 2 × Azure Standard_B16as_v2 (16 vCPU / 64 GB RAM) → **32 vCPU / 128 GB RAM total**
+**Node:** 2 × Azure Standard_B16als_v2 (16 vCPU / 32 GB RAM) → **32 vCPU / 64 GB RAM total**
 
 ### What runs in the cluster
 
 | Category | Count |
 |----------|-------|
-| Databases (YugabyteDB, Redis*, Elasticsearch, JanusGraph) | 4 |
+| Databases (YugabyteDB, Elasticsearch, JanusGraph) | 3 |
 | Flink Jobs (enabled by default) | 5 |
-| Application Services  | 14 |
+| Application Services | 14 |
 | Monitoring Stack (Grafana, Loki, Prometheus, Grafana Alloy) | 4 |
 | Velero (backup & disaster recovery) | 1 |
 
-> *Redis is optional 
-
 ### Resources without addons
 
-| Resource | Request | Limit | Disk |
-|----------|---------|-------|------|
-| CPU | ~21 cores | ~50 cores | — |
-| Memory | ~40 Gi | ~74 Gi | — |
-| Disk | — | — | ~219 Gi |
+| Resource | Request | Limit |
+|----------|---------|-------|
+| CPU | 17.2 cores | 32.2 cores |
+| Memory | 40.58 Gi | 78.92 Gi |
 
 ### Optional addons
 
@@ -36,11 +33,10 @@ Minimum resources required to install and run Sunbird-ED on any cloud provider
 
 ### Resources with all addons installed
 
-| Resource | Request | Limit | Disk |
-|----------|---------|-------|------|
-| CPU | ~22 cores | ~60 cores | — |
-| Memory | ~43 Gi | ~91 Gi | — |
-| Disk | — | — | ~219 Gi |
+| Resource | Request | Limit |
+|----------|---------|-------|
+| CPU | 17.8 cores | 38.2 cores |
+| Memory | 41.98 Gi | 87.92 Gi |
 
 > No additional nodes needed — the same 2-node cluster handles base + all addons.
 

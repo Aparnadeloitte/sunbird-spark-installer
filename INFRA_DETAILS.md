@@ -8,7 +8,7 @@ Per-component resource breakdown for the sunbird-spark-installer. All resource v
 
 | Cloud Provider | Node Count | VM / Machine Type | vCPU per Node | RAM per Node | Total vCPU | Total RAM |
 |----------------|-----------|-------------------|---------------|--------------|------------|-----------|
-| **Azure (AKS)** | 2 | Standard_B16as_v2 | 16 | 64 GB | 32 | 128 GB |
+| **Azure (AKS)** | 2 | Standard_B16als_v2 | 16 | 32 GB | 32 | 64 GB |
 
 ---
 
@@ -22,8 +22,8 @@ Primary distributed database used across all building blocks. Deployed as **6 po
 
 | Component | Pods | CPU req / limit | Memory req / limit | Disk per pod | Total Disk |
 |-----------|------|-----------------|--------------------|--------------|------------|
-| Master | 3 | 2 / 2 | 2 Gi / 2 Gi | 20 Gi (2 PVCs × 10 Gi) | 60 Gi |
-| TServer | 3 | 2 / 2 | 4 Gi / 4 Gi | 20 Gi (2 PVCs × 10 Gi) | 60 Gi |
+| Master (yb-master-0/1/2) | 3 | 1 / 1 | 2 Gi / 2 Gi | 20 Gi (2 PVCs × 10 Gi) | 60 Gi |
+| TServer (yb-tserver-0/1/2) | 3 | 2 / 2 | 4 Gi / 4 Gi | 20 Gi (2 PVCs × 10 Gi) | 60 Gi |
 | **YugabyteDB Total** | **6** | | | | **120 Gi** |
 
 | Port | Usage |
@@ -57,7 +57,7 @@ Used by KnowledgeBB and LearnBB.
 | Parameter | Value |
 |-----------|-------|
 | Pods | 1 master node |
-| CPU request / limit | 1 / 2 |
+| CPU request / limit | 500m / 1 |
 | Memory request / limit | 2 Gi / 4 Gi |
 | JVM Heap | 2 G |
 | Disk | 25 Gi |
@@ -70,7 +70,7 @@ Used by KnowledgeBB. Storage backend is YugabyteDB (CQL) — no local disk.
 | Parameter | Value |
 |-----------|-------|
 | Pods | 1 |
-| CPU request / limit | 1 / 3 |
+| CPU request / limit | 1 / 1.5 |
 | Memory request / limit | 3 Gi / 6 Gi |
 | Persistence | None (uses external YugabyteDB) |
 | Port | 8182 |
@@ -131,8 +131,8 @@ Runs in KRaft mode. **3 controller pods** (each acts as broker + controller).
 | Parameter | Value |
 |-----------|-------|
 | Pods | 3 (controllers) |
-| CPU request / limit | 750m / 1 |
-| Memory request / limit | 1024 Mi / 2048 Mi |
+| CPU request / limit | 500m / 750m |
+| Memory request / limit | 1 Gi / 2 Gi |
 | Disk per pod | 8 Gi |
 | Port | 9092 |
 
@@ -153,8 +153,8 @@ Runs as a deployment + node-agent daemonset (1 pod per node).
 |----------|-------------|-----------|----------------|--------------|------|
 | Databases (excl. optional Redis) | ~15 cores | ~18 cores | ~23 Gi | ~28 Gi | ~195 Gi |
 | Flink Jobs (5 enabled) | ~1 core | ~10 cores | ~10 Gi | ~20 Gi | — |
-| Application Services + Kafka (22 services) | ~5 cores | ~22 cores | ~6.5 Gi | ~26 Gi | ~24 Gi |
-| **Grand Total** | **~21 cores** | **~50 cores** | **~40 Gi** | **~74 Gi** | **~219 Gi** |
+| Application Services + Kafka | ~5 cores | ~22 cores | ~6.5 Gi | ~26 Gi | ~24 Gi |
+| **Grand Total** | **17.2 cores** | **32.2 cores** | **40.58 Gi** | **78.92 Gi** | **~219 Gi** |
 
 **Disk breakdown:**
 - YugabyteDB: 6 pods × 2 PVCs × 10 Gi = 120 Gi
@@ -204,10 +204,10 @@ Flink job that converts uploaded videos to HLS streaming format.
 
 | Category | CPU Request | CPU Limit | Memory Request | Memory Limit | Disk |
 |----------|-------------|-----------|----------------|--------------|------|
-| Base Platform | ~21 cores | ~50 cores | ~40 Gi | ~74 Gi | ~219 Gi |
-| DIAL Addon | ~0.5 cores | ~5 cores | ~2 Gi | ~9 Gi | — |
-| Discussion Forum Addon | ~0.3 cores | ~3 cores | ~0.3 Gi | ~4 Gi | — |
-| Video Stream Generator Addon | ~0.2 cores | ~2 cores | ~1 Gi | ~4 Gi | — |
-| **Grand Total (all addons)** | **~22 cores** | **~60 cores** | **~43 Gi** | **~91 Gi** | **~219 Gi** |
+| Base Platform | 17.2 cores | 32.2 cores | 40.58 Gi | 78.92 Gi | ~219 Gi |
+| DIAL Addon | 200m | 2 | 600 Mi | 3 Gi | — |
+| Discussion Forum Addon | 300m | 3 | 300 Mi | 4 Gi | — |
+| Video Stream Generator Addon | 100m | 1 | 500 Mi | 2 Gi | — |
+| **Grand Total (all addons)** | **17.8 cores** | **38.2 cores** | **41.98 Gi** | **87.92 Gi** | **~219 Gi** |
 
 > All addons together add only ~1 CPU core and ~3 Gi of memory requests. **No additional nodes are needed** — the same 2-node cluster handles base + all addons.
