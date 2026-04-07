@@ -188,7 +188,7 @@ base_config: |
 
     {{- else if eq "azure" .Values.global.checkpoint_store_type }}
     statebackend {
-      base.url = "wasbs://{{ .Values.global.private_container_name }}@{{ .Values.global.object_storage_endpoint }}/checkpoint"
+      base.url = "abfs://{{ .Values.global.private_container_name }}@{{ .Values.global.object_storage_endpoint }}/checkpoint"
     }
 
     {{- else if eq "gcs" .Values.global.checkpoint_store_type }}
@@ -367,12 +367,13 @@ flink_jobs:
 
       cloud_storage_type="{{ .Values.global.sunbird_cloud_storage_provider }}"
       {{- if eq .Values.global.cloud_storage_provider "azure" }}
+      cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
       cloud_storage_secret=""
       cloud_storage_auth_type="{{ .Values.global.cloud_storage_auth_type }}"
       {{- else }}
+      cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
       cloud_storage_secret="{{ .Values.global.cloud_storage_secret_key }}"
       {{- end }}
-      cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
       cloud_storage_container="{{ .Values.global.public_container_name }}"
       cloud_storage_endpoint=""
       schema.base_path="https://{{ .Values.global.object_storage_endpoint }}/{{ .Values.global.public_container_name }}/schemas/local"
@@ -599,7 +600,7 @@ flink_jobs:
 
       cloud_storage_type="{{ .Values.global.sunbird_cloud_storage_provider }}"
       {{- if eq .Values.global.cloud_storage_provider "azure" }}
-      cloud_storage_key=""
+      cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
       cloud_storage_secret=""
       cloud_storage_auth_type="{{ .Values.global.cloud_storage_auth_type }}"
       {{- else }}
