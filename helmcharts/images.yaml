@@ -337,6 +337,6 @@ global:
     tag: "spark-f1.18-v1_1c442d5"
 
   learnflink:
-    registry: "ghcr.io/sunbird-lern"
+    registry: "ghcr.io/aimansharief"
     repository: "data-pipeline"
-    tag: "spark-v0.6_3734950"
+    tag: "spark-flinku-v2_6d326ce"
