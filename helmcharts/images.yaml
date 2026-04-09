@@ -339,4 +339,4 @@ global:
   learnflink:
     registry: "ghcr.io/aimansharief"
     repository: "data-pipeline"
-    tag: "spark-flinku-v2_6d326ce"
+    tag: "spark-flinku-v3_1481fb1"
