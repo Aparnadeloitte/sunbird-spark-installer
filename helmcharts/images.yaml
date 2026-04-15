@@ -33,10 +33,6 @@ images:
     repository: "elasticsearch"
     tag: "7.10.2"
 
-  neo4j: &neo4j
-    repository: "sunbirded.azurecr.io/neo4j"
-    tag: "3.3.0"
-
   grafana: &grafana
     registry: "docker.io"
     repository: "grafana/grafana"
@@ -87,7 +83,7 @@ images:
 
   adminutil: &adminutil
     repository: "ghcr.io/sunbird-lern/sunbird-apimanager-util"
-    tag: "release-7.0.0_RC1_1_6c8f6f"
+    tag: "release-8.0.0_rc1_21f5d46_1"
 
   cert: &cert
     repository: "ghcr.io/sunbird-lern/cert-service"
@@ -107,7 +103,7 @@ images:
 
   keycloak: &keycloak
     repository: "ghcr.io/sunbird-spark/keycloak-21.1.2"
-    tag: "develop_acec8d0"
+    tag: "develop_dbc2db2"
 
   keycloak-kids-keys: &keycloak-kids-keys
     repository: "ghcr.io/sunbird-spark/keycloak-postgres-query"
@@ -123,7 +119,7 @@ images:
 
   knowlg: &knowlg
     repository: "ghcr.io/sunbird-knowlg/knowledge-platform/knowlg-service"
-    tag: "spark-v16_ad7adbb"
+    tag: "spark-v17_7d8451a"
 
   search: &search
     repository: "ghcr.io/sunbird-knowlg/knowledge-platform/search-api"
@@ -155,9 +151,13 @@ images:
     repository: sunbird-spark/janusgraph
     tag: develop_cb093d4
 
+  secor: &secor
+    repository: "sunbirded.azurecr.io/secor"
+    tag: "spark"
+
   yugabytecql: &yugabytecql
     repository: "ghcr.io/sunbird-spark/sunbird-yugabyte-migrations"
-    tag: "develop_e3f9f55"
+    tag: "develop_596f901"
 
 # Internal block with pull secrets
 internal: &internal
@@ -183,11 +183,6 @@ internal: &internal
 
   elasticsearch:
     image: *elasticsearch
-    imagePullSecrets:
-      - name: "registry-secret-name"
-
-  neo4j:
-    image: *neo4j
     imagePullSecrets:
       - name: "registry-secret-name"
 
@@ -335,6 +330,11 @@ internal: &internal
     imagePullSecrets:
       - name: "registry-secret-name"
 
+  secor:
+    image: *secor
+    imagePullSecrets:
+      - name: "registry-secret-name"
+
 # Merge internal into root for direct access
 <<: *internal
 
@@ -343,9 +343,9 @@ global:
   knowledgeflink:
     registry: "ghcr.io"
     repository: "sunbird-knowlg/knowledge-platform-jobs"
-    tag: "spark-ics-1_4cb45f4"
+    tag: "spark-f1.18-v1_1c442d5"
 
   learnflink:
     registry: "ghcr.io/sunbird-lern"
     repository: "data-pipeline"
-    tag: "spark-v0.5_0254304"
+    tag: "spark-v0.6_3734950"

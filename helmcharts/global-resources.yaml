@@ -8,15 +8,6 @@ adminutil:
       memory: 1G
 
 
-bot:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 100Mi
-    limits:
-      cpu: 1000m
-      memory: 1024Mi
-
 echo:
   resources:
     requests:
@@ -240,15 +231,6 @@ telemetry:
       cpu: 1
       memory: 1024Mi
 
-userorg:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 100Mi
-    limits:
-      cpu: 1
-      memory: 1024Mi 
-
 #monitoring
 alloy:
  alloy:
@@ -335,15 +317,6 @@ lern:
       cpu: 1
       memory: 2Gi
 
-learning:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 1024Mi
-    limits:
-      cpu: 1
-      memory: 4096Mi  
-
 loki:
   gateway:
     resources: 
@@ -373,28 +346,7 @@ loki:
           cpu: 250m
           memory: 400Mi
 
-neo4j:
-  resources:
-    requests:
-      cpu: "0.5"
-      memory: "2Gi"
-    limits:
-      cpu: "1"
-      memory: "4Gi"
-  neo4j:
-    pvc:
-      storage: 25Gi
-
-promtail:
-  resources:
-    limits:
-      cpu: 200m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-
-redis: 
+redis:
   master:
     persistence:
       size: 25Gi
@@ -418,31 +370,16 @@ reloader:
           cpu: 1000m
           memory: 1G
 
-report: 
+secor:
   resources:
     requests:
-      cpu: 100m
-      memory: 100Mi
+      cpu: 128m
+      memory: 512Mi
     limits:
-      cpu: 1000m
-      memory: 1G
+      cpu: 512m
+      memory: 1Gi
 
-spark: 
-  master:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 2Gi
-      requests:
-        cpu: 500m
-        memory: 1Gi
-  persistence:
-    spark_data_pvc:
-      size: 25Gi
-    log_data_pvc:
-      size: 25Gi
-
-taxonomy:
+search:
   resources:
     requests:
       cpu: 100m
@@ -450,6 +387,7 @@ taxonomy:
     limits:
       cpu: 1
       memory: 1024Mi
+
 
 velero:
   resources: 
