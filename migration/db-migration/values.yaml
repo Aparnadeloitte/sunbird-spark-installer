@@ -184,17 +184,13 @@ elasticsearchMigration:
   snapshotName: "snapshot_1"             # Name of the ES snapshot to create/restore
   repositoryName: "azure_backup"         # ES repository name registered on both clusters
 
-  # Cluster endpoints
-  oldEsUrl: ""                            # Old cluster LoadBalancer IP
+  # Cluster endpoint
   newEsUrl: ""  # New cluster in-cluster DNS
 
   # New ES pod (for keystore credential injection via kubectl exec)
   newEsPodName: "elasticsearch-master-0"
   newEsNamespace: ""
   esKeystorePath: "/opt/bitnami/elasticsearch/bin/elasticsearch-keystore"
-
-  # NOTE: Old ES keystore must be pre-configured manually with Azure credentials
-  # before running this migration. The script does NOT manage the old ES keystore.
 
 # ============================
 # createdat Backfill Configuration

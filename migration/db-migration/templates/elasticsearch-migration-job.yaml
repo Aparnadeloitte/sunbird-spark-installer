@@ -45,9 +45,6 @@ spec:
           curl -sSL "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl" -o /tmp/kubectl
           chmod +x /tmp/kubectl && mv /tmp/kubectl /usr/local/bin/kubectl
 
-          # Install Azure CLI
-          curl -sL https://aka.ms/InstallAzureCLIDeb | bash
-
           python3 /scripts/migrate_elasticsearch.py
 
         env:
@@ -63,8 +60,6 @@ spec:
           value: "{{ .Values.elasticsearchMigration.snapshotName }}"
         - name: REPOSITORY_NAME
           value: "{{ .Values.elasticsearchMigration.repositoryName }}"
-        - name: OLD_ES_URL
-          value: "{{ .Values.elasticsearchMigration.oldEsUrl }}"
         - name: NEW_ES_URL
           value: "{{ .Values.elasticsearchMigration.newEsUrl }}"
         - name: NEW_ES_POD_NAME
