@@ -5,6 +5,7 @@ variable "environment" {
 
 variable "aks_version" {
   type        = string
+  default     = null
   description = "AKS Kubernetes version to pin. Find available versions with: az aks get-versions --location <region> --output table"
 }
 
