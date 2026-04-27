@@ -45,8 +45,12 @@ echo "STORAGE_ACCOUNT_NAME: $STORAGE_ACCOUNT_NAME"
 echo "CONTAINER_NAME: $CONTAINER_NAME"
 echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
 
-# Create resource group
-az group create --name "$RESOURCE_GROUP_NAME" --location "$location"
+# Create resource group only if it does not already exist
+if az group show --name "$RESOURCE_GROUP_NAME" &>/dev/null; then
+  echo "Resource group '$RESOURCE_GROUP_NAME' already exists, skipping creation."
+else
+  az group create --name "$RESOURCE_GROUP_NAME" --location "$location"
+fi
 
 # Create the storage account
 az storage account create --resource-group "$RESOURCE_GROUP_NAME" \
