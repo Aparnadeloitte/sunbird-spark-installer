@@ -23,6 +23,7 @@ SUBSCRIPTION_ID=""     # Your Azure Subscription ID (Azure Portal → Subscripti
 BUILDING_BLOCK=""      # Short resource prefix — must match global.building_block in global-values.yaml (e.g. "myorg")
 ENVIRONMENT=""         # Environment name — must match configs/ folder name and GitHub Actions environment name (e.g. "dev")
 RESOURCE_GROUP=""      # Azure resource group where all infra will be created (e.g. "myorg-dev")
+LOCATION=""            # Azure region for the resource group (e.g. "eastus", "centralindia")
 GITHUB_REPO=""         # Your private devops repo as "org/repo" (e.g. "my-org/my-spark-devops")
 GITHUB_ENVIRONMENT=""  # GitHub Actions environment name — must match ENVIRONMENT above
 # ─────────────────────────────────────────────────────────────────────────────
@@ -33,6 +34,7 @@ APP_NAME="${BUILDING_BLOCK}-${ENVIRONMENT}-github"
 # Custom role config
 CUSTOM_ROLE_NAME="${BUILDING_BLOCK}-${ENVIRONMENT}-installer-role"
 
+SUBSCRIPTION_SCOPE="/subscriptions/$SUBSCRIPTION_ID"
 RG_SCOPE="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP"
 CLUSTER_SCOPE="$RG_SCOPE/providers/Microsoft.ContainerService/managedClusters/$CLUSTER_NAME"
 
@@ -41,10 +43,10 @@ create_or_reuse_sp() {
   local name=$1
 
   local existing_id
-  existing_id=$(az ad app list --display-name "$name" --query "[0].appId" -o tsv 2>/dev/null || echo "")
+  existing_id=$(az ad app list --show-mine --filter "displayName eq '$name'" --query "[0].appId" -o tsv 2>/dev/null || echo "")
 
   if [ -n "$existing_id" ]; then
-    echo "✓ App already exists, reusing: $name ($existing_id)"
+    echo "✓ App already exists, reusing: $name ($existing_id)" >&2
     echo "$existing_id"
     return
   fi
@@ -69,12 +71,13 @@ add_federated_credential() {
   local client_id=$1
   local cred_name=$2
 
+  local subject="repo:${GITHUB_REPO}:environment:${GITHUB_ENVIRONMENT}"
   local exists
   exists=$(az ad app federated-credential list --id "$client_id" \
-    --query "[?name=='$cred_name'].name" -o tsv 2>/dev/null || echo "")
+    --query "[?subject=='$subject'].name" -o tsv 2>/dev/null || echo "")
 
   if [ -n "$exists" ]; then
-    echo "✓ Federated credential already exists, skipping: $cred_name"
+    echo "✓ Federated credential already exists (subject matches), skipping: $cred_name"
     return
   fi
 
@@ -111,7 +114,10 @@ ensure_custom_role() {
   "IsCustom": true,
   "Description": "Least-privilege role for Sunbird-Spark installer. Lets OpenTofu manage AKS, networking, storage, managed identity, and RBAC inside the target resource group.",
   "Actions": [
+    "Microsoft.Resources/subscriptions/read",
     "Microsoft.Resources/subscriptions/resourceGroups/read",
+    "Microsoft.Resources/subscriptions/resourceGroups/write",
+    "Microsoft.Resources/subscriptions/resourceGroups/delete",
     "Microsoft.Resources/deployments/*",
 
     "Microsoft.ContainerService/managedClusters/*",
@@ -144,7 +150,9 @@ ensure_custom_role() {
   "DataActions": [
     "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
     "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
-    "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete"
+    "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete",
+    "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/move/action",
+    "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action"
   ],
   "NotActions": [],
   "NotDataActions": [],
@@ -169,7 +177,7 @@ EOF
 }
 
 # ── Validate inputs ────────────────────────────────────────
-for var in TENANT_ID SUBSCRIPTION_ID BUILDING_BLOCK ENVIRONMENT RESOURCE_GROUP GITHUB_REPO GITHUB_ENVIRONMENT; do
+for var in TENANT_ID SUBSCRIPTION_ID BUILDING_BLOCK ENVIRONMENT RESOURCE_GROUP LOCATION GITHUB_REPO GITHUB_ENVIRONMENT; do
   if [ -z "${!var}" ]; then
     echo "❌ ERROR: $var is not set. Please edit the variables at the top of this script before running."
     exit 1
@@ -181,6 +189,10 @@ echo "Logging in to Azure..."
 az login --tenant $TENANT_ID
 az account set --subscription $SUBSCRIPTION_ID
 echo "✓ Subscription: $SUBSCRIPTION_ID"
+
+# ── Step 2: Ensure resource group exists ───────────────────
+az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
+echo "✓ Resource group ready: $RESOURCE_GROUP"
 
 # ══════════════════════════════════════════════════════════
 # SP 1 — INFRA
