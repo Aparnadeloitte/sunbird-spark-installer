@@ -63,7 +63,7 @@ provider "azurerm" {
     principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id
     scope                = var.vnet_subnet_id
     role_definition_name = "Network Contributor"
-    
+
     depends_on = [azurerm_kubernetes_cluster.aks]
   }
 
