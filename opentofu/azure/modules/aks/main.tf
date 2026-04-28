@@ -56,6 +56,16 @@ provider "azurerm" {
         )
   }
 
+  # Grant Network Contributor role to AKS System-Assigned Identity
+  # Required for kubenet clusters to manage route tables on the VNet subnet
+  resource "azurerm_role_assignment" "aks_network_contributor" {
+    principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id
+    scope                = var.vnet_subnet_id
+    role_definition_name = "Network Contributor"
+
+    depends_on = [azurerm_kubernetes_cluster.aks]
+  }
+
   # resource "azurerm_kubernetes_cluster_node_pool" "small_nodepool" {
   #   name                  = var.small_nodepool_name
   #   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
