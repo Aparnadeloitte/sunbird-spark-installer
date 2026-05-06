@@ -31,11 +31,12 @@ provider "azurerm" {
     oidc_issuer_enabled       = true
     workload_identity_enabled = true
     default_node_pool {
-      name           = var.big_nodepool_name
-      node_count     = var.big_node_count
-      vm_size        = var.big_node_size
-      vnet_subnet_id = var.vnet_subnet_id
-      max_pods       = 250
+      name                 = var.big_nodepool_name
+      node_count           = var.big_node_count
+      vm_size              = var.big_node_size
+      vnet_subnet_id       = var.vnet_subnet_id
+      max_pods             = 250
+      orchestrator_version = var.aks_version
     }
 
     network_profile {
