@@ -205,8 +205,7 @@ kong_apis:
   - {{ .Values.statsd_pulgin | toYaml | nindent 4 | trim }}
   - name: acl
     config.allow:
-    - contentAdmin
-    - contentTempAccess
+    - portalAnonymous
   - name: rate-limiting
     config.policy: local
     config.hour: "{{ .Values.medium_rate_limit_per_hour }}"
