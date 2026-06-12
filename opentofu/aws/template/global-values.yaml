@@ -42,8 +42,8 @@ global:
   google_captcha_private_key: "6Ldw9wEtAAAAAI0TapZZdcoTOaI7P1kBGQhtpjBi"
   sunbird_google_oauth_clientId: 'REPLACE_ME'
   sunbird_google_oauth_clientSecret: "REPLACE_ME"
-  mail_server_from_email: "r.aparna1999@gmail.com"
-  mail_server_password: "ietj lxhl klkr gyhh"
+  mail_server_from_email: "REPLACE_ME"
+  mail_server_password: "REPLACE_ME"
   mail_server_host: smtp.gmail.com
   mail_server_port: "587"
   mail_server_username: apikey
