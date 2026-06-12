@@ -349,3 +349,8 @@ global:
     registry: "ghcr.io/sunbird-lern"
     repository: "data-pipeline"
     tag: "spark-v1.0.0_c3b332f"
+
+  inquiryflink:
+    registry: "sunbirded.azurecr.io"
+    repository: "data-pipeline"
+    tag: "release-8.0.0_RC1_b4f909c"

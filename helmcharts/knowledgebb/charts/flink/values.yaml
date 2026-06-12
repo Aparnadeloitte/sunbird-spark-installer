@@ -9,6 +9,13 @@ image:
   pullPolicy: IfNotPresent
   pullSecrets: []
 
+# Flink job images ship Azure CSP only; on AWS inject cloud-storage-sdk-aws at runtime.
+lib_mount_path: /opt/flink/lib
+aws_csp:
+  enabled: false
+  maven_image: maven:3.9-eclipse-temurin-17
+  artifact_version: "2.0.1"
+
 podAnnotations: {}
 
 podSecurityContext:
@@ -201,6 +208,7 @@ base_config: |
     }
     {{- else }}
     # No valid checkpoint_store_type configured, skipping statebackend.
+    enable.distributed.checkpointing = false
     {{- end }}
   }
     
@@ -369,6 +377,13 @@ flink_jobs:
       cloudstorage.write_base_path={{ include "common.tplvalues.render" (dict "value" .Values.cloudstorage_write_base_path "context" $) }}
       cloudstorage.metadata.list={{ .Values.cloudstorage_metadatalist }}
 
+      {{- if eq .Values.global.cloud_storage_provider "aws" }}
+      cloud_storage_type="{{ .Values.global.sunbird_cloud_storage_provider }}"
+      cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
+      cloud_storage_secret="{{ .Values.global.cloud_storage_secret_key }}"
+      cloud_storage_endpoint="https://{{ .Values.global.object_storage_endpoint }}"
+      cloud_storage_region="{{ .Values.global.cloud_storage_region }}"
+      {{- else }}
       cloud_storage_type="{{ .Values.global.sunbird_cloud_storage_provider }}"
       cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
       {{- if eq .Values.global.cloud_storage_provider "azure" }}
@@ -377,8 +392,9 @@ flink_jobs:
       {{- else }}
       cloud_storage_secret="{{ .Values.global.cloud_storage_secret_key }}"
       {{- end }}
-      cloud_storage_container="{{ .Values.global.public_container_name }}"
       cloud_storage_endpoint=""
+      {{- end }}
+      cloud_storage_container="{{ .Values.global.public_container_name }}"
       schema.base_path="https://{{ .Values.global.object_storage_endpoint }}/{{ .Values.global.public_container_name }}/schemas/local"
 
 
@@ -601,6 +617,13 @@ flink_jobs:
       cloudstorage.write_base_path={{ include "common.tplvalues.render" (dict "value" .Values.cloudstorage_write_base_path "context" $) }}
       cloudstorage.metadata.list={{ .Values.cloudstorage_metadatalist }}
 
+      {{- if eq .Values.global.cloud_storage_provider "aws" }}
+      cloud_storage_type="{{ .Values.global.sunbird_cloud_storage_provider }}"
+      cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
+      cloud_storage_secret="{{ .Values.global.cloud_storage_secret_key }}"
+      cloud_storage_endpoint="https://{{ .Values.global.object_storage_endpoint }}"
+      cloud_storage_region="{{ .Values.global.cloud_storage_region }}"
+      {{- else }}
       cloud_storage_type="{{ .Values.global.sunbird_cloud_storage_provider }}"
       cloud_storage_key="{{ .Values.global.cloud_storage_access_key }}"
       {{- if eq .Values.global.cloud_storage_provider "azure" }}
@@ -609,8 +632,9 @@ flink_jobs:
       {{- else }}
       cloud_storage_secret="{{ .Values.global.cloud_storage_secret_key }}"
       {{- end }}
-      cloud_storage_container="{{ .Values.global.public_container_name }}"
       cloud_storage_endpoint=""
+      {{- end }}
+      cloud_storage_container="{{ .Values.global.public_container_name }}"
       schema {
         basePath="https://{{ .Values.global.object_storage_endpoint }}/{{ .Values.global.public_container_name }}/schemas/local"
         supportedVersion = {
@@ -632,6 +656,11 @@ flink_jobs:
       heartbeat.interval: 5000
       taskmanager.memory.process.size: 2800m
       jobmanager.memory.process.size: 1600m
+      plugins.dir: /opt/flink/plugins
+      fs.allowed-fallback-filesystems: s3
+      fs.s3.impl: org.apache.flink.fs.s3hadoop.S3FileSystemFactory
+      fs.s3n.impl: org.apache.flink.fs.s3hadoop.S3FileSystemFactory
+      fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
       # classloader.resolve-order: "parent-first"
       # state.savepoints.dir: file:///tmp
     job_classname: org.sunbird.job.knowlg.task.KnowlgPublishStreamTask
