@@ -1,9 +1,9 @@
 deployed_dial_addon: &deployed_dial_addon "false"
 default_passwords:
-  grafana_admin_password: &grafana-admin-password "7EgAdFe4kepLtHVu"
-  superset_admin_password: &superset-admin-password "9rIPPKegfZ3TfMP9"
-  keycloak_password: &keycloak-password "pabtEQZY3xO2xe9Y"
-  postgresql_password: &postgresql-password "sWguSdt6HTQfS9Yi"
+  grafana_admin_password: &grafana-admin-password ""
+  superset_admin_password: &superset-admin-password ""
+  keycloak_password: &keycloak-password ""
+  postgresql_password: &postgresql-password ""
 kube-prometheus-stack:
   grafana:
     adminUser: admin
