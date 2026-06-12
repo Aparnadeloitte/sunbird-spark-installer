@@ -4,10 +4,10 @@ global:
   building_block: sunbird-spark
   cloud_storage_access_key:   
   cloud_storage_secret_key: 
-  public_container_name: sunbird-spark-dev-public-8eedcadf58
-  private_container_name: sunbird-spark-dev-private-8eedcadf58
-  dial_state_container_public: sunbird-spark-dev-dial-8eedcadf58
-  velero_container_name: sunbird-spark-dev-velero-private-8eedcadf58
+  public_container_name: 
+  private_container_name: 
+  dial_state_container_public: 
+  velero_container_name: 
   private_ingressgateway_ip: 
   encryption__string: dummy-encryption-string
   random_string: dummy-string
@@ -38,13 +38,13 @@ velero:
     backupStorageLocation:
       - name: default
         provider: aws
-        bucket: "sunbird-spark-dev-velero-private-8eedcadf58"
+        bucket: ""
         config:
           region: us-east-1
     dbbackupbackupStorageLocation:
       - name: dbbackup
         provider: aws
-        bucket: "sunbird-spark-dev-velero-private-8eedcadf58"
+        bucket: ""
         config:
           region: us-east-1
     backupSyncPeriod: 15m
