@@ -29,7 +29,7 @@ function create_tf_resources() {
     echo -e "\nCreating resources on AWS cloud"
     
     # Deploy modules in order
-    modules=("network" "storage" "random_passwords" "eks" "output-file")
+    modules=("network" "storage" "random_passwords" "keys" "eks" "output-file" "upload-files")
     
     for module in "${modules[@]}"; do
         echo -e "\n=== Deploying $module ==="
@@ -43,23 +43,23 @@ function create_tf_resources() {
 }
 function certificate_keys() {
     #  # If keys already present in global-values.yaml → skip writing
-    if grep -q -E '^[[:space:]]*CERTIFICATE_PRIVATE_KEY:' ../terraform/aws/$environment/global-values.yaml 2>/dev/null; then
+    if grep -q -E '^[[:space:]]*CERTIFICATE_PRIVATE_KEY:' ../opentofu/aws/$environment/global-values.yaml 2>/dev/null; then
         echo "Certificate keys already present — skipping generation and write."
         return
     fi
     # Generate private and public keys using openssl
     echo "Creation of RSA keys for certificate signing"
-    openssl genrsa -out ../terraform/aws/$environment/certkey.pem;
-    openssl rsa -in ../terraform/aws/$environment/certkey.pem -pubout -out ../terraform/aws/$environment/certpubkey.pem;
-    CERTPRIVATEKEY=$(sed 's/KEY-----/KEY-----\\n/g' ../terraform/aws/$environment/certkey.pem | sed 's/-----END/\\n-----END/g' | awk '{printf("%s",$0)}')
-    CERTPUBLICKEY=$(sed 's/KEY-----/KEY-----\\n/g' ../terraform/aws/$environment/certpubkey.pem | sed 's/-----END/\\n-----END/g' | awk '{printf("%s",$0)}')
-    CERTIFICATESIGNPRKEY=$(sed 's/BEGIN PRIVATE KEY-----/BEGIN PRIVATE KEY-----\\\\n/g' ../terraform/aws/$environment/certkey.pem | sed 's/-----END PRIVATE KEY/\\\\n-----END PRIVATE KEY/g' | awk '{printf("%s",$0)}')
-    CERTIFICATESIGNPUKEY=$(sed 's/BEGIN PUBLIC KEY-----/BEGIN PUBLIC KEY-----\\\\n/g' ../terraform/aws/$environment/certpubkey.pem | sed 's/-----END PUBLIC KEY/\\\\n-----END PUBLIC KEY/g' | awk '{printf("%s",$0)}')
-    printf "\n" >> ../terraform/aws/$environment/global-values.yaml
-    echo "  CERTIFICATE_PRIVATE_KEY: \"$CERTPRIVATEKEY\"" >> ../terraform/aws/$environment/global-values.yaml
-    echo "  CERTIFICATE_PUBLIC_KEY: \"$CERTPUBLICKEY\"" >> ../terraform/aws/$environment/global-values.yaml
-    echo "  CERTIFICATESIGN_PRIVATE_KEY: \"$CERTIFICATESIGNPRKEY\"" >> ../terraform/aws/$environment/global-values.yaml
-    echo "  CERTIFICATESIGN_PUBLIC_KEY: \"$CERTIFICATESIGNPUKEY\"" >> ../terraform/aws/$environment/global-values.yaml
+    openssl genrsa -out ../opentofu/aws/$environment/certkey.pem;
+    openssl rsa -in ../opentofu/aws/$environment/certkey.pem -pubout -out ../opentofu/aws/$environment/certpubkey.pem;
+    CERTPRIVATEKEY=$(sed 's/KEY-----/KEY-----\\n/g' ../opentofu/aws/$environment/certkey.pem | sed 's/-----END/\\n-----END/g' | awk '{printf("%s",$0)}')
+    CERTPUBLICKEY=$(sed 's/KEY-----/KEY-----\\n/g' ../opentofu/aws/$environment/certpubkey.pem | sed 's/-----END/\\n-----END/g' | awk '{printf("%s",$0)}')
+    CERTIFICATESIGNPRKEY=$(sed 's/BEGIN PRIVATE KEY-----/BEGIN PRIVATE KEY-----\\\\n/g' ../opentofu/aws/$environment/certkey.pem | sed 's/-----END PRIVATE KEY/\\\\n-----END PRIVATE KEY/g' | awk '{printf("%s",$0)}')
+    CERTIFICATESIGNPUKEY=$(sed 's/BEGIN PUBLIC KEY-----/BEGIN PUBLIC KEY-----\\\\n/g' ../opentofu/aws/$environment/certpubkey.pem | sed 's/-----END PUBLIC KEY/\\\\n-----END PUBLIC KEY/g' | awk '{printf("%s",$0)}')
+    printf "\n" >> ../opentofu/aws/$environment/global-values.yaml
+    echo "  CERTIFICATE_PRIVATE_KEY: \"$CERTPRIVATEKEY\"" >> ../opentofu/aws/$environment/global-values.yaml
+    echo "  CERTIFICATE_PUBLIC_KEY: \"$CERTPUBLICKEY\"" >> ../opentofu/aws/$environment/global-values.yaml
+    echo "  CERTIFICATESIGN_PRIVATE_KEY: \"$CERTIFICATESIGNPRKEY\"" >> ../opentofu/aws/$environment/global-values.yaml
+    echo "  CERTIFICATESIGN_PUBLIC_KEY: \"$CERTIFICATESIGNPUKEY\"" >> ../opentofu/aws/$environment/global-values.yaml
 }
 
 
@@ -192,30 +192,102 @@ function install_component() {
         -f "$script_dir/global-cloud-values.yaml" --timeout 30m --debug
 }
 
+
+
+function install_service() {
+    if [ $# -lt 2 ]; then
+        echo "Usage: ./install.sh install_service <bundle> <chart> [chart2] [chart3] ..."
+        return 1
+    fi
+
+    local bundle="$1"
+    shift
+    local target_charts=("$@")   # one or more chart names
+
+    local current_directory="$(pwd)"
+    if [ "$(basename "$current_directory")" != "helmcharts" ]; then
+        cd ../../../helmcharts 2>/dev/null || true
+    fi
+
+    if [ ! -d "$bundle" ]; then
+        echo "Error: bundle '$bundle' not found in helmcharts/"
+        return 1
+    fi
+
+    local ed_values_flag=""
+    if [ -f "$bundle/ed-values.yaml" ]; then
+        ed_values_flag="-f $bundle/ed-values.yaml"
+    fi
+
+    if helm status "$bundle" --namespace sunbird &>/dev/null; then
+        # Phase B: Release exists — reuse previous values, enable all target charts
+        echo -e "\nRelease '$bundle' exists — upgrading '${target_charts[*]}' (Phase B)"
+
+        # Build --set enabled flags for every target chart
+        local set_flags=""
+        for chart in "${target_charts[@]}"; do
+            set_flags="$set_flags --set ${chart}.enabled=true"
+        done
+
+        helm upgrade "$bundle" "$bundle" \
+            --namespace sunbird \
+            --reuse-values \
+            $set_flags \
+            $ed_values_flag \
+            $addon_values_flag \
+            -f images.yaml \
+            -f "global-resources.yaml" \
+            -f "../opentofu/aws/$environment/global-values.yaml" \
+            -f "../opentofu/aws/$environment/global-cloud-values.yaml" \
+            --timeout 30m \
+            --debug
+    else
+        # Phase A: No release yet — enable all target charts, disable every other conditional chart
+        echo -e "\nNo existing release for '$bundle' — deploying '${target_charts[*]}' (Phase A)"
+
+        local set_flags=""
+        while IFS= read -r chart_name; do
+            local is_target=false
+            for chart in "${target_charts[@]}"; do
+                [ "$chart_name" = "$chart" ] && is_target=true && break
+            done
+            if $is_target; then
+                set_flags="$set_flags --set ${chart_name}.enabled=true"
+            else
+                set_flags="$set_flags --set ${chart_name}.enabled=false"
+            fi
+        done < <(yq '.dependencies[] | select(has("condition")) | .name' "$bundle/Chart.yaml")
+
+        helm upgrade --install "$bundle" "$bundle" \
+            --namespace sunbird \
+            $ed_values_flag \
+            $addon_values_flag \
+            -f images.yaml \
+            -f "global-resources.yaml" \
+            -f "../opentofu/aws/$environment/global-values.yaml" \
+            -f "../opentofu/aws/$environment/global-cloud-values.yaml" \
+            $set_flags \
+            --timeout 30m \
+            --debug
+    fi
+}
+
 function install_helm_components() {
-    components=("monitoring" "edbb" "learnbb" "knowledgebb" "obsrvbb" "inquirybb" "additional")
-    for component in "${components[@]}"; do
-        install_component "$component"
-    done
+    if [ $# -ge 2 ]; then
+        # Two or more args: deploy one or more services within a bundle
+        install_service "$@"
+    elif [ $# -eq 1 ]; then
+        # One arg: deploy the entire bundle
+        install_component "$1"
+    else
+        # No args: deploy all bundles in order (original behavior)
+        local components=("monitoring" "edbb" "learnbb" "knowledgebb" "obsrvbb" "additional")
+        for component in "${components[@]}"; do
+            install_component "$component"
+        done
+    fi
 }
 
-function post_install_nodebb_plugins() {
-    echo ">> Waiting for NodeBB deployment to be ready..."
-    kubectl rollout status deployment nodebb -n sunbird --timeout=300s
-
-    echo ">> Activating NodeBB plugins..."
-    kubectl exec -n sunbird deploy/nodebb -- ./nodebb activate nodebb-plugin-create-forum
-    kubectl exec -n sunbird deploy/nodebb -- ./nodebb activate nodebb-plugin-sunbird-oidc
-    kubectl exec -n sunbird deploy/nodebb -- ./nodebb activate nodebb-plugin-write-api
-
-    echo ">> Rebuilding NodeBB to apply plugin changes..."
-    kubectl exec -n sunbird deploy/nodebb -- ./nodebb build
-
-    echo ">> Restarting NodeBB..."
-    kubectl delete pod -n sunbird -l app.kubernetes.io/name=nodebb
-
-    echo "NodeBB plugins are activated, built, and NodeBB has been restarted."
-}
 
 function get_domain_name() {
     local script_dir domain
@@ -596,7 +668,7 @@ if [ $# -eq 0 ]; then
     cd ../../../helmcharts
     install_helm_components
     cd "$INSTALL_DIR"
-    post_install_nodebb_plugins
+    # post_install_nodebb_plugins
     restart_workloads_using_keys
     certificate_config
     dns_mapping
@@ -617,11 +689,15 @@ else
     "dns_mapping")
         dns_mapping
         ;;
+    "install_service")
+        shift
+        install_service "$@"
+        ;;
     "install_component")
         shift
         if [ $# -eq 0 ]; then
             echo "Usage: ./install.sh install_component <component_name>"
-            echo "Available components: monitoring edbb learnbb knowledgebb obsrvbb inquirybb additional"
+            echo "Available components: monitoring edbb learnbb knowledgebb obsrvbb additional"
             exit 1
         fi
         install_component "$1"

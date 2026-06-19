@@ -26,6 +26,5 @@ inputs = {
   storage_account_name               = dependency.storage.outputs.public_bucket_name
   storage_container_public           = dependency.storage.outputs.public_bucket_name
   storage_container_private          = dependency.storage.outputs.private_bucket_name
-  storage_account_primary_access_key = ""  # Not needed for S3
   # random_string                      = local.random_string 
 }

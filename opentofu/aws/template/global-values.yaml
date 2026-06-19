@@ -22,15 +22,15 @@ global:
   # Cluster-level variables for AWS setup and networking
   vpc_cidr_block: "10.1.0.0/16"
   create_network: "true"
-  gke_node_default_disk_size_gb: 100
+  eks_node_default_disk_size_gb: 100
   object_storage_endpoint: s3.amazonaws.com
   sunbird_cloud_storage_provider: "aws"
   checkpoint_store_type: "oci"
   cloud_service_provider: "aws"
   cloud_storage_provider: "aws"
   cloud_storage_region: ""
-  zone: ""
-  cloud_storage_project: ""
+  region: ""
+  cloud_storage_account_id: ""
   # Provide your domain name
   # Example: sunbird.com
   domain: "REPLACE_ME"
